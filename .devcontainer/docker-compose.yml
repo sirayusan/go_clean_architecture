@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  go:
+    build: ./infra/go/
+    ports:
+      - 8080:8080
+    volumes:
+      - ../../business:/data
+    working_dir: /data
+    tty: true

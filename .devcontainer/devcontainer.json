@@ -1,0 +1,13 @@
+{
+    "name": "abc",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "go",
+    "workspaceFolder": "/data",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "com.intellij.plugins.vscodekeymap",
+            ],
+        }
+    }
+}
