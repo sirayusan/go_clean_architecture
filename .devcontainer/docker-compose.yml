@@ -3,34 +3,38 @@ services:
   go:
     build: ./infra/go/
     ports:
-      - 8080:8080
+      - ${PORT}:8080
     volumes:
       - ../../business:/data
+      - ../../business/.devcontainer/.env:/data/.env
     working_dir: /data
     tty: true
 
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0
     ports:
-      - 3306:3306
+      - ${DB_PORT}:3306
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ../../business/.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
+      - ../../${PROJECT_NAME}/.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
       - db-data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: mysql
       PMA_ARBITRARY: 1
-      PMA_USER: root
-      PMA_PASSWORD: "password"
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASSWORD}
     links:
       - mysql
     ports:
-      - 4000:80
+      - ${PHPMYADMIN_PORT}:80
 
 volumes:
   db-data:
