@@ -27,7 +27,6 @@ func Serve(addr string) {
 		log.Println(err)
 		return
 	}
-	fmt.Println("接続できたよ")
 	user := controller.User{
 		OutputFactory: presenter.NewUserOutputPort,
 		InputFactory:  interactor.NewUserInputPort,

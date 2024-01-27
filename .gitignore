@@ -1,4 +1,5 @@
 .env
+.devcontainer/.env
 
 # air(ホットリロード)で勝手に更新されるので除外
 /tmp/*
