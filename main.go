@@ -1,23 +1,21 @@
 package main
 
 import (
+	"business/driver"
 	"github.com/labstack/echo/v4"
-	"net/http"
-	"os"
 )
 
 func main() {
+	// port　は環境変数GO_PORTを取得した値。
+	//port := os.ExpandEnv(":${GO_PORT}")
+	port := ":8080"
+
 	// Echoインスタンスを作成
 	e := echo.New()
-	go
 
-	// ルートルートに対するハンドラを登録
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Echo!")
-	})
+	driver.Serve(e, port)
 
-	// サーバーを8080ポートで起動
-	if err := e.Start(os.ExpandEnv(":${GO_PORT}")); err != nil {
+	if err := e.Start(port); err != nil {
 		e.Logger.Fatal(err)
 	}
 }
