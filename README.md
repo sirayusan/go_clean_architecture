@@ -31,9 +31,11 @@ Go言語の技術的な検証や動作確認用として作成しました。
 ![image](https://github.com/sirayusan/business/assets/73060776/989e02ae-9595-451a-93e6-d637a33fb0aa)
 
 ![image](https://github.com/sirayusan/business/assets/73060776/739bd03a-b40d-4fc6-a209-474225fbb41c)
+
 8. Alt + F12でターミナルを開く
 
 ![image](https://github.com/sirayusan/business/assets/73060776/26fc15e0-09d3-43be-afa1-120889d1aa24)
+
 9. `air`とターミナルに入力しEnter
 
 このような表示が出たら環境構築完了。
@@ -44,13 +46,16 @@ Go言語の技術的な検証や動作確認用として作成しました。
 1. Golandの右上のデバッガのVみたいなマークを押下する。
 
 ![image](https://github.com/sirayusan/business/assets/73060776/85d61cf2-b5af-4b09-b522-834e2012402b)
+
 2. Edit Configurations...をクリック
 
 ![image](https://github.com/sirayusan/business/assets/73060776/43477116-2fd8-481e-97a8-6e768b021750)
 
 3. +マークから Go Remoteを選択し、スクションの内容にする
 Name: お好みで
+
 Host: localhost
+
 Port: 2345(.envのGO_DEBUG_PORT参照。)
 
 ![image](https://github.com/sirayusan/business/assets/73060776/41a90cde-b2e8-430d-8526-285ba889a515)
