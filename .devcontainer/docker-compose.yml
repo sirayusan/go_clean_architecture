@@ -1,14 +1,19 @@
-version: "3.9"
+version: "3"
 services:
   go:
     build: ./infra/go/
-    ports:
-      - ${PORT}:8080
-    volumes:
-      - ../../business:/data
-      - ../../business/.devcontainer/.env:/data/.env
-    working_dir: /data
     tty: true
+    ports:
+      - ${GO_PORT}:${GO_PORT}
+      - ${GO_DEBUG_PORT}:${GO_DEBUG_PORT}
+    volumes:
+      - ${PROJECT_ROOT}:/data
+    security_opt: # delve用に必要
+      - apparmor:unconfined
+    cap_add: # delve用に必要
+      - SYS_PTRACE
+    environment:
+      GO_PORT: ${GO_PORT}
 
   mysql:
     image: mysql:8.0
@@ -16,7 +21,7 @@ services:
       - ${DB_PORT}:3306
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ../../${PROJECT_NAME}/.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
+      - ${PROJECT_ROOT}/.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
       - db-data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${DATABASE}
