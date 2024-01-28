@@ -52,6 +52,7 @@ Go言語の技術的な検証や動作確認用として作成しました。
 ![image](https://github.com/sirayusan/business/assets/73060776/43477116-2fd8-481e-97a8-6e768b021750)
 
 3. +マークから Go Remoteを選択し、スクションの内容にする
+
 Name: お好みで
 
 Host: localhost
