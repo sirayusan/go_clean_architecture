@@ -1,5 +1,5 @@
 {
-    "name": "abc",
+    "name": "Go DevContainer",
     "dockerComposeFile": "docker-compose.yml",
     "service": "go",
     "workspaceFolder": "/data",

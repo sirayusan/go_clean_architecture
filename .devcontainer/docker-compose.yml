@@ -1,10 +1,46 @@
-version: "3.9"
+version: "3"
 services:
   go:
     build: ./infra/go/
-    ports:
-      - 8080:8080
-    volumes:
-      - ../../business:/data
-    working_dir: /data
     tty: true
+    ports:
+      - ${GO_PORT}:${GO_PORT}
+      - ${GO_DEBUG_PORT}:${GO_DEBUG_PORT}
+    volumes:
+      - ${PROJECT_ROOT}:/data
+    security_opt: # delve用に必要
+      - apparmor:unconfined
+    cap_add: # delve用に必要
+      - SYS_PTRACE
+    environment:
+      GO_PORT: ${GO_PORT}
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - ${DB_PORT}:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ${PROJECT_ROOT}/.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_ARBITRARY: 1
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASSWORD}
+    links:
+      - mysql
+    ports:
+      - ${PHPMYADMIN_PORT}:80
+
+volumes:
+  db-data:
+    driver: local
