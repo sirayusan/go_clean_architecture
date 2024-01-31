@@ -12,10 +12,8 @@ func NewRouter(e *echo.Echo, t usecase.User, l logger.Interface) {
 
 	// UserRoutesのインスタンスを作成
 	userRouteHandlers := NewUserRoutes(t, l)
-
-	// UserRoutesのメソッドをルートとして登録
 	u := e.Group("/user")
-	u.GET("/index", userRouteHandlers.GetUserList)
+	u.GET("/index", userRouteHandlers.getUserList)
 
 	e.Logger.Fatal(e.Start(port))
 }

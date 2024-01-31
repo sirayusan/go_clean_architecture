@@ -9,7 +9,6 @@ import (
 type (
 	// User -.
 	User interface {
-		Translate(context.Context, entity.User) (entity.User, error)
 		UserList(context.Context) ([]entity.User, error)
 	}
 
@@ -17,10 +16,5 @@ type (
 	UserRepo interface {
 		Store(context.Context, entity.User) error
 		GetUserList(context.Context) ([]entity.User, error)
-	}
-
-	// UserWebAPI -.
-	UserWebAPI interface {
-		Translate(entity.User) (entity.User, error)
 	}
 )

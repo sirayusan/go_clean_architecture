@@ -5,7 +5,6 @@ import (
 	"business/internal/controller/http/v2"
 	"business/internal/usecase"
 	"business/internal/usecase/repo"
-	"business/internal/usecase/webapi"
 	"business/pkg/logger"
 	"business/pkg/mysql"
 	"fmt"
@@ -27,8 +26,7 @@ func Run(cfg *config.Config) {
 	defer conn.Close()
 
 	UserUseCase := usecase.New(
-		repo.New(conn), // MySQL接続を渡す
-		webapi.New(),
+		repo.New(conn), // MySQL接続インスタンス
 	)
 
 	v2.NewRouter(e, UserUseCase, l)

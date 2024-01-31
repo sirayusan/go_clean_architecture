@@ -9,15 +9,13 @@ import (
 
 // UserUseCase -.
 type UserUseCase struct {
-	repo   UserRepo
-	webAPI UserWebAPI
+	repo UserRepo
 }
 
 // New -.
-func New(r UserRepo, w UserWebAPI) *UserUseCase {
+func New(r UserRepo) *UserUseCase {
 	return &UserUseCase{
-		repo:   r,
-		webAPI: w,
+		repo: r,
 	}
 }
 
@@ -29,19 +27,4 @@ func (uc *UserUseCase) UserList(ctx context.Context) ([]entity.User, error) {
 	}
 
 	return translations, nil
-}
-
-// Translate -.
-func (uc *UserUseCase) Translate(ctx context.Context, t entity.User) (entity.User, error) {
-	//translation, err := uc.webAPI.Translate(t)
-	//if err != nil {
-	//	return entity.User{}, fmt.Errorf("UserUseCase - Translate - s.webAPI.Translate: %w", err)
-	//}
-	//
-	//err = uc.repo.Store(context.Background(), translation)
-	//if err != nil {
-	//	return entity.User{}, fmt.Errorf("UserUseCase - Translate - s.repo.Store: %w", err)
-	//}
-
-	return entity.User{}, nil
 }
