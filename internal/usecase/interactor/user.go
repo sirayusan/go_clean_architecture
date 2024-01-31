@@ -8,9 +8,8 @@ interactorはアウトプットポートに依存し(importするということ
 */
 
 import (
+	"business/internal/usecase/port"
 	"context"
-
-	"business/usecase/port"
 )
 
 type User struct {

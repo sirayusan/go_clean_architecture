@@ -5,9 +5,8 @@ port パッケージは，出力や入力などのポート(interface)を提供�
 */
 
 import (
+	"business/internal/entity"
 	"context"
-
-	"business/entity"
 )
 
 type UserInputPort interface {
