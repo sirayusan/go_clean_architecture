@@ -14,7 +14,6 @@ type (
 
 	// UserRepo -.
 	UserRepo interface {
-		Store(context.Context, entity.User) error
 		GetUserList(context.Context) ([]entity.User, error)
 	}
 )

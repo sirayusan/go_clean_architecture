@@ -16,11 +16,6 @@ func New(db *mysql.MySQL) *Mysql {
 	return &Mysql{db}
 }
 
-func (r *Mysql) Store(ctx context.Context, user entity.User) error {
-	// ユーザー情報をデータベースに保存するロジックを実装
-	return nil
-}
-
 func (r *Mysql) GetUserList(ctx context.Context) ([]entity.User, error) {
 	conn := r.conn // MySQL構造体内の*sql.DBにアクセス
 	query := "SELECT id, name FROM `user`"
