@@ -6,7 +6,7 @@ ARG UID=1000
 ARG GID=1000
 ARG IDEURL=https://download.jetbrains.com/go/goland-2023.3.3.tar.gz
 ENV TZ Asia/Tokyo
-ENV APP_ROOT /home/$USERNAME/app
+ENV APP_ROOT /data
 RUN apt-get update && \
     apt-get install -y vim && \
     rm -rf /var/lib/apt/lists/*

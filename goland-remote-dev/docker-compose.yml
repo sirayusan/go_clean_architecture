@@ -12,8 +12,8 @@ services:
       - ${GO_DEBUG_PORT}:${GO_DEBUG_PORT}
       - "5994:5994"
     volumes:
-      - ../:/home/go/app
-      - /home/go/app/ide
+      - ../:/data
+      - /data/ide
       - ~/.gitconfig:/home/go/.gitconfig
     security_opt:
       - apparmor:unconfined
