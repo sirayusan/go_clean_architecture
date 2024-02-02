@@ -3,7 +3,7 @@ services:
   go:
     build:
       context: ../
-      dockerfile: ./goland-remote-dev/Dockerfile
+      dockerfile: ./remote-dev/Dockerfile
     env_file:
       - .env
     tty: true
