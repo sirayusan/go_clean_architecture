@@ -4,7 +4,7 @@ Vscodeでも開けます。
 
 ### ⚠️注意⚠️
 GoLandでDevContainerを使うには、Windows側のディレクトリへ配置している必要があります。  
-intelliJのDevContaierに原因があり失敗するためです。
+intelliJのDevContaierに原因があり失敗するためです。  
 https://blog.jetbrains.com/ja/2022/02/15/automate-intellij-remotedevenv/
 
 # 環境構築手順
