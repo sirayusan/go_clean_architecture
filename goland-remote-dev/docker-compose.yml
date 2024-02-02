@@ -1,17 +1,26 @@
 version: "3"
 services:
   go:
-    build: ./infra/go/
+    build:
+      context: ../
+      dockerfile: ./goland-remote-dev/Dockerfile
+    env_file:
+      - .env
     tty: true
     ports:
       - ${GO_PORT}:${GO_PORT}
       - ${GO_DEBUG_PORT}:${GO_DEBUG_PORT}
+      - "5994:5994"
     volumes:
-      - ${PROJECT_ROOT}:/data
-    security_opt: # delve用に必要
+      - ../:/home/go/app
+      - /home/go/app/ide
+      - ~/.gitconfig:/home/go/.gitconfig
+    security_opt:
       - apparmor:unconfined
-    cap_add: # delve用に必要
+    cap_add:
       - SYS_PTRACE
+    depends_on:
+      - mysql
     environment:
       GO_PORT: ${GO_PORT}
       DB_PORT: ${DB_PORT}
@@ -27,14 +36,9 @@ services:
       - ${DB_PORT}:3306
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ${PROJECT_ROOT}/.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
-      - db-data:/var/lib/mysql
+      - ../.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-
-volumes:
-  db-data:
-    driver: local

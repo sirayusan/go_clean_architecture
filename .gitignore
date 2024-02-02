@@ -6,3 +6,7 @@
 
 # 多分コンテナ作成時に勝手に作成されるキャッシュなので除外
 .attach_pid*
+
+# GoLand用のリモートコンテナ作成時勝手に作成されるので削除。
+/goland-remote-dev/.idea/*
+/goland-remote-dev/.ide/*
