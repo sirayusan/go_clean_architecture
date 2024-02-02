@@ -1,10 +1,11 @@
 package entity
 
-/*
-entity パッケージは，ドメインモデルを実装します．．
-*/
-
+// User -.
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type UserListResponse struct {
+	UserList []User `json:"user_list"`
 }
