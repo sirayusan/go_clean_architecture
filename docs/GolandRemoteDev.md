@@ -5,10 +5,10 @@ https://qiita.com/BlueBaybridge/items/c1adcf1dab5da2b40b4f
 # 環境構築手順
 1. `git clone https://github.com/sirayusan/business.git`
 2. `cd remote-dev`
-3. `docker compose build --no-cache`  
+3. `docker-compose build --no-cache`  
 このような表示がでたら完了 
 ![image](https://github.com/sirayusan/business/assets/73060776/36d6b237-4d8e-4b06-8498-2354a371eef0)
-4. `docker compose up -d`  
+4. `docker-compose up -d`  
 このような表示がでたら完了  
 ![image](https://github.com/sirayusan/business/assets/73060776/15593eb2-75b2-4abe-a575-1fce15fd1091)
 5. Docker for Desktopを起動し、goコンテナのログを確認し、tcp:// … のリンクをコピーする
