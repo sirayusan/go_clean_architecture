@@ -5,14 +5,22 @@ Go言語の技術的な検証や動作確認用として作成しました。
 * Go1.20
 ## DB
 * MySQL8.0
-## 環境構築関連
+## 環境構築
 * Docker
 * DevContainer
 ## 開発支援ツール
 * Air(ホットリロード)
 * delve(デバッガ)
+## サポートされているIDE
+* VsCode
+* GoLand
 ## ディレクトリ構成の方針
 * クリーンアーキテクチャ
 # 環境構築手順
 [DevContainerを使う手順](./docs/DevContainer.md)  
-[WSL2配下配置していてGoLandを使っている方](./docs/GolandRemoteDev.md)
+ DevContainerを使用して開発環境を構築する方法について説明しています。
+
+[WSL2配下配置していてGoLandを使っている方](./docs/GolandRemoteDev.md)  
+WSL2上でGoLandをリモート開発環境として使用する方法について説明しています。
+# デバッグ手順
+プロジェクトのデバッグ方法については、[デバッグ手順](./docs/debug.md) を参照してください。このドキュメントでは、delveを使用した効率的なデバッグプロセスを紹介しています。

@@ -17,3 +17,5 @@ https://qiita.com/BlueBaybridge/items/c1adcf1dab5da2b40b4f
 ![image](https://github.com/sirayusan/business/assets/73060776/86afc3ff-270c-4a86-bb3f-dd15859c9bf8)
 7. Connectを押下し  
 8. あとは流れでボタンを押して行き開くだけ
+# デバッグ手順
+プロジェクトのデバッグ方法については、[デバッグ手順](./debug.md) を参照してください。このドキュメントでは、delveを使用した効率的なデバッグプロセスを紹介しています。
