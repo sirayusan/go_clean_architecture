@@ -1,24 +1,46 @@
 package mysql
 
 import (
-	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"os"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type MySQL struct {
-	*sql.DB
+	DB *gorm.DB
 }
 
-// New Config引数を削除
+// New はGORMを使用してMySQLデータベースに接続するための新しいMySQLインスタンスを生成します。
 func New() (*MySQL, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.ExpandEnv("${MYSQL_USER}"), os.ExpandEnv("${MYSQL_PASSWORD}"), os.ExpandEnv("${DB_HOST}"), os.ExpandEnv("${DB_PORT}"), os.ExpandEnv("${MYSQL_DATABASE}"))
-	conn, err := sql.Open("mysql", dsn)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		os.ExpandEnv("${MYSQL_USER}"), os.ExpandEnv("${MYSQL_PASSWORD}"),
+		os.ExpandEnv("${DB_HOST}"), os.ExpandEnv("${DB_PORT}"),
+		os.ExpandEnv("${MYSQL_DATABASE}"))
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	return &MySQL{conn}, nil
+
+	return &MySQL{DB: db}, nil
+}
+
+// NewTest はGORMを使用してMySQLデータベースに接続するための新しいMySQLインスタンスを生成します。
+func NewTest() (*MySQL, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		os.ExpandEnv("${MYSQL_USER}"), os.ExpandEnv("${MYSQL_PASSWORD}"),
+		os.ExpandEnv("${DB_HOST}"), os.ExpandEnv("${DB_PORT}"),
+		os.ExpandEnv("${MYSQL_TEST_DATABASE}"))
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &MySQL{DB: db}, nil
 }

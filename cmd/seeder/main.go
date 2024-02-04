@@ -1,0 +1,39 @@
+package main
+
+import (
+	"business/db/seeder"
+	"business/pkg/mysql"
+	"fmt"
+	"os"
+)
+
+func main() {
+	// コマンドラインのバリデーション
+	err := seeder.CheckArgs()
+	if err != nil {
+		fmt.Printf("error: %s\n", err)
+		return
+	}
+
+	var conn *mysql.MySQL
+	if os.Args[1] == "dev" {
+		conn, err = mysql.New()
+	} else if os.Args[1] == "test" {
+		conn, err = mysql.NewTest()
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	// connがnilでないことを確認
+	if conn == nil || conn.DB == nil {
+		panic("データベース接続が初期化されていません。")
+	}
+
+	err = seeder.Seed(conn.DB)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("正常に終了しました。\n")
+}

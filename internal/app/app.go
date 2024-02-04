@@ -19,11 +19,10 @@ func Run(cfg *config.Config) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	conn, err := mysql.New() // MySQL設定を使用
+	conn, err := mysql.New()
 	if err != nil {
 		l.Fatal(fmt.Errorf("app - Run - mysql.New: %w", err))
 	}
-	defer conn.Close()
 
 	UserUseCase := usecase.New(
 		repo.New(conn), // MySQL接続インスタンス

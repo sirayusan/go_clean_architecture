@@ -4,42 +4,28 @@ import (
 	"business/internal/entity"
 	"business/pkg/mysql"
 	"context"
-	"errors"
-	"log"
+	"fmt"
+	"gorm.io/gorm"
 )
 
-type Mysql struct {
-	conn *mysql.MySQL
+type UserRepository struct {
+	DB *gorm.DB
 }
 
-func New(db *mysql.MySQL) *Mysql {
-	return &Mysql{db}
+// New は新しいRepositoryインスタンスを生成します。
+func New(db *mysql.MySQL) *UserRepository {
+	return &UserRepository{DB: db.DB} // MySQL構造体のDBフィールドを使ってRepositoryを初期化
 }
 
-func (r *Mysql) GetUserList(ctx context.Context) ([]entity.User, error) {
-	conn := r.conn // MySQL構造体内の*sql.DBにアクセス
-	query := "SELECT id, name FROM `user`"
-	rows, err := conn.QueryContext(ctx, query)
+// GetUserList はユーザーリストを取得します。
+func (r *UserRepository) GetUserList(ctx context.Context) ([]entity.User, error) {
+	var userList []entity.User
+	err := r.DB.Table("user").
+		Find(&userList).
+		Error // GORMのTableメソッドを使用
+
 	if err != nil {
-		log.Println(err)
-		return nil, errors.New("Internal Server Error. adapter/gateway/GetHistory")
+		return nil, fmt.Errorf("failed to get user list: %w", err)
 	}
-	defer rows.Close()
-
-	var users []entity.User
-	for rows.Next() {
-		var user entity.User
-		if err := rows.Scan(&user.ID, &user.Name); err != nil {
-			log.Println(err)
-			return nil, errors.New("Internal Server Error. adapter/gateway/GetHistory")
-		}
-		users = append(users, user)
-	}
-
-	if err = rows.Err(); err != nil {
-		log.Println(err)
-		return nil, errors.New("Internal Server Error. adapter/gateway/GetHistory")
-	}
-
-	return users, nil
+	return userList, nil
 }

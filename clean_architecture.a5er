@@ -1,0 +1,111 @@
+﻿# A5:ER FORMAT:18
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright © 2007 m.matsubara
+# A5:SQL Mk-2 Version 2.19.0 Copyright © 1997 - 2024 m.matsubara
+#  https://a5m2.mmatsubara.com
+
+[Manager]
+ProjectName=go-clean_architecture
+Author=
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+Page=Main
+PageInfo="Main",7,"A3Landscape",$FFFFFF
+LogicalView=1
+DecodeDomain=0
+ViewModePageIndividually=1
+ViewMode=7
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=Tahoma
+FontSize=6
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+RDBMSTypeName=Oracle Database
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+UpperCaseKeyword=0
+ShowTag=1
+ShowCommonAttributes=0
+BugFixEntityWidth=1
+
+[Entity]
+PName=users
+LName=ユーザー
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=500
+Top=100
+Field="ユーザーID","user_id","int unsigned,auto_increment ","NOT NULL",,"","",$FFFFFFFF,""
+Field="氏","last_name","VARCHAR2(100)","NOT NULL",,"","",$FFFFFFFF,""
+Field="名","first_name","VARCHAR2(100)","NOT NULL",,"","",$FFFFFFFF,""
+Field="氏(かな)","hiragana_last_name","VARCHAR2(100)","NOT NULL",,"","",$FFFFFFFF,""
+Field="名(かな)","hiragana_first_name","VARCHAR2(100)","NOT NULL",,"","",$FFFFFFFF,""
+Field="メールアドレス","email","@VARCHAR(256)","NOT NULL",,"","",$FFFFFFFF,""
+Field="パスワード","password","@VARCHAR(256)","NOT NULL",,"","",$FFFFFFFF,""
+Field="パスワード再設定中フラグ","is_password_reset_in_progress","boolean","NOT NULL",,"false","",$FFFFFFFF,""
+Field="登録者ID","create_user_id","int unsigned","NOT NULL",,"0","",$FFFFFFFF,""
+Field="登録日時","created_at","TIMESTAMP","NOT NULL",,"","",$FFFFFFFF,""
+Field="更新者ID","update_user_id","int unsigned","NOT NULL",,"0","",$FFFFFFFF,""
+Field="更新日時","update_at","TIMESTAMP","NOT NULL",,"","",$FFFFFFFF,""
+Field="削除日時","deleted_at","TIMESTAMP","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20240204190008
+Position="Main",500,100,798,403
+ZOrder=1
+
+[Entity]
+PName=authentications
+LName=認証
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=1600
+Top=100
+Field="ユーザーID","user_id","int unsigned","NOT NULL",,"","",$FFFFFFFF,""
+Field="トークン","token","@VARCHAR(256)","NOT NULL",,"","",$FFFFFFFF,""
+Field="使用可能期限日時","use_possible_deadlines","datetime","NOT NULL",,"","",$FFFFFFFF,""
+Field="作成日","created_at","TIMESTAMP","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20240204154408
+Position="Main",1600,100,646,159
+ZOrder=2
+
+[Relation]
+Entity1=users
+Entity2=authentications
+RelationType1=2
+RelationType2=1
+Fields1=user_id
+Fields2=user_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,2071,7929,4054,R,R,""
+Dependence=0
+Caption=
+PName=
+NoDDL=1
+ModifiedDateTime=20240204154237
+LineMode=0
+Bar1=207
+Bar2=793
+Bar3=405
+TermPos1=R
+TermPos2=R
+ZOrder=3
