@@ -26,6 +26,7 @@ rm -rf ide && \
 mkdir ide && \
 tar xfz ide.tar.gz --strip-components=1 -C ide && \
 rm ide.tar.gz
-CMD ["sh", "-c", "air -c .air.toml & ide/bin/remote-dev-server.sh run $APP_ROOT --listenOn 0.0.0.0 --port 5994"]
+#　MYSQLが起動する前にコンパイルされエラーになる。
+#CMD ["sh", "-c", "air -c .air.toml & ide/bin/remote-dev-server.sh run $APP_ROOT --listenOn 0.0.0.0 --port 5994"]
 EXPOSE 8080
 EXPOSE 5994
