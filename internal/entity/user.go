@@ -2,8 +2,9 @@ package entity
 
 // User -.
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	UserID    uint32 `gorm:"column:user_id"`
+	LastName  string `gorm:"column:last_name"`
+	FirstName string `gorm:"column:first_name"`
 }
 
 type UserListResponse struct {

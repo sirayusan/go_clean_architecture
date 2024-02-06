@@ -21,6 +21,11 @@ func New(db *mysql.MySQL) *UserRepository {
 func (r *UserRepository) GetUserList(ctx context.Context) ([]entity.User, error) {
 	var userList []entity.User
 	err := r.DB.Table("users").
+		Select(
+			"user_id",
+			"last_name",
+			"first_name",
+		).
 		Find(&userList).
 		Error // GORMのTableメソッドを使用
 

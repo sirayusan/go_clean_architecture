@@ -18,6 +18,16 @@ func CreateUser(db *gorm.DB) {
 			CreatedUserID:     0,
 			UpdateUserID:      0,
 		},
+		{
+			LastName:          "今井",
+			FirstName:         "次郎",
+			HiraganaLastName:  "いまい",
+			HiraganaFirstName: "たろう",
+			Email:             "abcd@co.jp",
+			Password:          "パスワード",
+			CreatedUserID:     0,
+			UpdateUserID:      0,
+		},
 	}
 
 	for _, user := range users {
