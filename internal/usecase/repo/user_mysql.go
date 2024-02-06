@@ -20,7 +20,7 @@ func New(db *mysql.MySQL) *UserRepository {
 // GetUserList はユーザーリストを取得します。
 func (r *UserRepository) GetUserList(ctx context.Context) ([]entity.User, error) {
 	var userList []entity.User
-	err := r.DB.Table("user").
+	err := r.DB.Table("users").
 		Find(&userList).
 		Error // GORMのTableメソッドを使用
 

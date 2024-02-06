@@ -8,7 +8,16 @@ import (
 // CreateUser　はサンプルデータを投入する。
 func CreateUser(db *gorm.DB) {
 	users := []model.User{
-		{Email: "abc@co.jp"},
+		{
+			LastName:          "高橋",
+			FirstName:         "太郎",
+			HiraganaLastName:  "たかはし",
+			HiraganaFirstName: "たろう",
+			Email:             "abc@co.jp",
+			Password:          "パスワード",
+			CreatedUserID:     0,
+			UpdateUserID:      0,
+		},
 	}
 
 	for _, user := range users {
