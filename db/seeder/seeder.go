@@ -22,8 +22,11 @@ func CheckArgs() error {
 }
 
 // Seed　はサンプルデータを投入する。
-func Seed(db *gorm.DB) error {
-	seeders.CreateUser(db)
+func Seed(tx *gorm.DB) error {
+	var err error
+	if err = seeders.CreateUser(tx); err != nil {
+		return err
+	}
 
 	return nil
 }
