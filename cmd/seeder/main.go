@@ -30,9 +30,14 @@ func main() {
 		panic("データベース接続が初期化されていません。")
 	}
 
-	err = seeder.Seed(conn.DB)
+	tx, cleanUP := mysql.Transactional(conn.DB)
+	defer cleanUP()
+
+	err = seeder.Seed(tx)
 	if err != nil {
-		panic(err)
+		tx.Error = err
+		fmt.Printf("データ投入中にエラーが発生しました。\n")
+		return
 	}
 
 	fmt.Printf("正常に終了しました。\n")
