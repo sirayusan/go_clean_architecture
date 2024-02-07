@@ -23,5 +23,7 @@ air -c .air.toml & ide/bin/remote-dev-server.sh run /data --listenOn 0.0.0.0 --p
 ![image](https://github.com/sirayusan/business/assets/73060776/86afc3ff-270c-4a86-bb3f-dd15859c9bf8)
 8. Connectを押下し  
 9. あとは流れでボタンを押して行き開くだけ
+# テーブル作成とデータ投入手順
+テーブル作成とデータ投入は[こちら](./migration.md) を参照してください。
 # デバッグ手順
 プロジェクトのデバッグ方法については、[デバッグ手順](./debug.md) を参照してください。このドキュメントでは、delveを使用した効率的なデバッグプロセスを紹介しています。

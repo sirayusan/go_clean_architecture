@@ -24,6 +24,8 @@ https://blog.jetbrains.com/ja/2022/02/15/automate-intellij-remotedevenv/
 ![image](https://github.com/sirayusan/business/assets/73060776/26fc15e0-09d3-43be-afa1-120889d1aa24)  
 9. `air`とターミナルに入力しEnter  
 このような表示が出たら環境構築完了。  
-![image](https://github.com/sirayusan/business/assets/73060776/54a74657-e32a-42ab-9c1d-64fea294b58d)  
+![image](https://github.com/sirayusan/business/assets/73060776/54a74657-e32a-42ab-9c1d-64fea294b58d)
+# テーブル作成とデータ投入手順
+テーブル作成とデータ投入は[こちら](./migration.md) を参照してください。
 # デバッグ手順
 プロジェクトのデバッグ方法については、[デバッグ手順](./debug.md) を参照してください。このドキュメントでは、delveを使用した効率的なデバッグプロセスを紹介しています。

@@ -6,7 +6,8 @@ import (
 )
 
 // CreateUser　はサンプルデータを投入する。
-func CreateUser(db *gorm.DB) {
+func CreateUser(tx *gorm.DB) error {
+	var err error
 	users := []model.User{
 		{
 			LastName:          "高橋",
@@ -31,6 +32,11 @@ func CreateUser(db *gorm.DB) {
 	}
 
 	for _, user := range users {
-		db.Create(&user) // データの投入
+		err := tx.Create(&user).Error
+		if err != nil {
+			return err
+		}
 	}
+
+	return err
 }
