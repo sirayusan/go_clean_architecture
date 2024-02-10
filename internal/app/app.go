@@ -32,7 +32,7 @@ func Run(cfg *config.Config) {
 
 	// フロントのURLをCORS承認する
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{os.ExpandEnv(":${FRONT_DOMAIN}")},
+		AllowOrigins: []string{os.ExpandEnv("${FRONT_DOMAIN}")},
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 	}))
 
