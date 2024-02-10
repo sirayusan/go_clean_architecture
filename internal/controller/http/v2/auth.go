@@ -4,6 +4,7 @@ import (
 	"business/internal/entity"
 	"business/internal/usecase/auth"
 	"errors"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 	"net/http"
@@ -38,7 +39,7 @@ func (r *AuthRoutes) Authentication(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	jwtToken, err := r.t.Authentication(param)
+	jwtToken, err := r.t.GenerateJwtToken(param)
 	if err != nil {
 		// ユーザーが存在しない場合もパスワードが一致しない場合も同じエラーを返す。
 		errMsg := "ユーザー認証に失敗しました。"
@@ -50,7 +51,7 @@ func (r *AuthRoutes) Authentication(c echo.Context) error {
 			r.l.Error(err, errMsg)
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": errMsg})
 		}
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("%v", err)})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"jwt": jwtToken})

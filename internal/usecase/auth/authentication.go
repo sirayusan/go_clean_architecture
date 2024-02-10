@@ -25,7 +25,7 @@ func New(r AuthRepo) *AuthUseCase {
 }
 
 // Authentication は入力値の顧客が存在したら、jwtトークンを生成して返す。
-func (uc *AuthUseCase) Authentication(param entity.LoginRequest) (string, error) {
+func (uc *AuthUseCase) GenerateJwtToken(param entity.LoginRequest) (string, error) {
 	user, err := uc.repo.GetUserByMail(param.Mail)
 	// DBと疎通できずエラーなのか、存在せずエラー(401)を分ける必要がある。
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
