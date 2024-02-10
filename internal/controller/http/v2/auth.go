@@ -38,7 +38,7 @@ func (r *AuthRoutes) Authentication(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	jwtToken, err := r.t.Authentication(param)
+	jwtToken, err := r.t.GenerateJwtToken(param)
 	if err != nil {
 		// ユーザーが存在しない場合もパスワードが一致しない場合も同じエラーを返す。
 		errMsg := "ユーザー認証に失敗しました。"

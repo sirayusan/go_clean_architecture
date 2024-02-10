@@ -31,7 +31,7 @@ func TestAuthentication(t *testing.T) {
 	mockRepo.On("GetUserByMail", "test@example.com").Return(user, nil)
 
 	// Authenticationメソッドを呼び出し
-	token, err := uc.Authentication(entity.LoginRequest{Mail: "test@example.com", Password: "パスワード"})
+	token, err := uc.GenerateJwtToken(entity.LoginRequest{Mail: "test@example.com", Password: "パスワード"})
 
 	// パスワード検証を行う
 	isValid := user.IsValidPassword("パスワード")
@@ -43,8 +43,9 @@ func TestAuthentication(t *testing.T) {
 
 	// 存在しないユーザーのケース
 	mockRepo.On("GetUserByMail", "unknown@example.com").Return(entity.LoginUser{}, gorm.ErrRecordNotFound)
-	_, err = uc.Authentication(entity.LoginRequest{Mail: "unknown@example.com", Password: "password"})
+	token, err = uc.GenerateJwtToken(entity.LoginRequest{Mail: "unknown@example.com", Password: "password"})
 	assert.Error(t, err)
+	assert.Empty(t, token)
 
 	//　パスワードが一致しないケース
 	user = entity.LoginUser{UserID: 1, EncryptedPassword: "暗号化後の値でないパスワード"}
@@ -53,6 +54,7 @@ func TestAuthentication(t *testing.T) {
 
 	// DBエラーのケース
 	mockRepo.On("GetUserByMail", "dberror@example.com").Return(entity.LoginUser{}, errors.New("db error"))
-	_, err = uc.Authentication(entity.LoginRequest{Mail: "dberror@example.com", Password: "password"})
+	token, err = uc.GenerateJwtToken(entity.LoginRequest{Mail: "dberror@example.com", Password: "password"})
 	assert.Error(t, err)
+	assert.Empty(t, token)
 }

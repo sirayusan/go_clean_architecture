@@ -7,7 +7,7 @@ import (
 type (
 	// Auth -.
 	Auth interface {
-		Authentication(entity.LoginRequest) (string, error)
+		GenerateJwtToken(entity.LoginRequest) (string, error)
 	}
 
 	// AuthRepo -.
