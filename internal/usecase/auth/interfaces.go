@@ -12,6 +12,6 @@ type (
 
 	// AuthRepo -.
 	AuthRepo interface {
-		GetUserByMail(string) (entity.LoginUserPassWord, error)
+		GetUserByMail(string) (entity.LoginUser, error)
 	}
 )

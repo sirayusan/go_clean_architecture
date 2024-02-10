@@ -23,6 +23,7 @@ services:
       - mysql
     environment:
       FRONT_DOMAIN: ${FRONT_DOMAIN}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       GO_PORT: ${GO_PORT}
       DB_PORT: ${DB_PORT}
       DB_HOST: ${DB_HOST}
@@ -45,3 +46,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+
+volumes:
+  db-data:
+    driver: local

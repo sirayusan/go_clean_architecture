@@ -18,10 +18,11 @@ func New(db *mysql.MySQL) *AuthRepository {
 }
 
 // GetUserByMail はユーザーリストを取得します。
-func (r *AuthRepository) GetUserByMail(email string) (entity.LoginUserPassWord, error) {
-	var user entity.LoginUserPassWord
+func (r *AuthRepository) GetUserByMail(email string) (entity.LoginUser, error) {
+	var user entity.LoginUser
 	err := r.DB.Table("users").
 		Select(
+			"user_id",
 			"password",
 		).
 		Where("email = ?", email).
@@ -29,10 +30,10 @@ func (r *AuthRepository) GetUserByMail(email string) (entity.LoginUserPassWord, 
 		Error
 
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		return entity.LoginUserPassWord{}, err
+		return entity.LoginUser{}, err
 	}
 	if err != nil {
-		return entity.LoginUserPassWord{}, fmt.Errorf("DB server Error: %w", err)
+		return entity.LoginUser{}, fmt.Errorf("DB serveer Error : %w", err)
 	}
 	return user, nil
 }

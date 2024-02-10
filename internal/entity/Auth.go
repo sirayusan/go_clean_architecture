@@ -9,12 +9,13 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-// LoginUserPassWord -.
-type LoginUserPassWord struct {
+// LoginUser -.
+type LoginUser struct {
+	UserID            uint32 `gorm:"column:user_id"`
 	EncryptedPassword string `gorm:"column:password"`
 }
 
-func (encryptedPassWord *LoginUserPassWord) IsValidPassword(password string) bool {
+func (encryptedPassWord *LoginUser) IsValidPassword(password string) bool {
 	// bcryptを使用してハッシュ化されたパスワードと平文のパスワードを比較
 	err := bcrypt.CompareHashAndPassword([]byte(encryptedPassWord.EncryptedPassword), []byte(password))
 	// エラーがなければ、パスワードは一致しているとみなす
