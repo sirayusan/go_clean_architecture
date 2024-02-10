@@ -1,19 +1,34 @@
 package v2
 
 import (
-	"business/internal/usecase"
-	"business/pkg/logger"
-	"github.com/labstack/echo/v4"
 	"os"
+
+	"business/internal/usecase"
+	authusecase "business/internal/usecase/auth"
+	authrepo "business/internal/usecase/auth/repo"
+	"business/internal/usecase/repo"
+	"business/pkg/logger"
+	"business/pkg/mysql"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(e *echo.Echo, t usecase.User, l logger.Interface) {
-	port := os.ExpandEnv(":${GO_PORT}")
+func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
+	UserUseCase := usecase.New(
+		repo.New(conn),
+	)
 	// UserRoutesのインスタンスを作成
-	userRouteHandlers := NewUserRoutes(t, l)
+	userRouteHandlers := NewUserRoutes(UserUseCase, l)
 	u := e.Group("/user")
 	u.GET("/index", userRouteHandlers.getUserList)
 
-	e.Logger.Fatal(e.Start(port))
+	authUseCase := authusecase.New(
+		authrepo.New(conn),
+	)
+	NewAuthRouter(e, authUseCase, l)
+
+	e.Logger.Fatal(e.Start(os.ExpandEnv(":${GO_PORT}")))
 }

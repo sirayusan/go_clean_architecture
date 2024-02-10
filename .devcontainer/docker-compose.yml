@@ -13,6 +13,8 @@ services:
     cap_add: # delve用に必要
       - SYS_PTRACE
     environment:
+      FRONT_DOMAIN: ${FRONT_DOMAIN}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       GO_PORT: ${GO_PORT}
       DB_PORT: ${DB_PORT}
       DB_HOST: ${DB_HOST}
