@@ -22,6 +22,8 @@ services:
     depends_on:
       - mysql
     environment:
+      FRONT_DOMAIN: ${FRONT_DOMAIN}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       GO_PORT: ${GO_PORT}
       DB_PORT: ${DB_PORT}
       DB_HOST: ${DB_HOST}
@@ -38,8 +40,13 @@ services:
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - ../.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
+      - db-data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+
+volumes:
+  db-data:
+    driver: local
