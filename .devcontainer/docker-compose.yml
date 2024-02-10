@@ -13,6 +13,7 @@ services:
     cap_add: # delve用に必要
       - SYS_PTRACE
     environment:
+      FRONT_DOMAIN: ${FRONT_DOMAIN}
       GO_PORT: ${GO_PORT}
       DB_PORT: ${DB_PORT}
       DB_HOST: ${DB_HOST}

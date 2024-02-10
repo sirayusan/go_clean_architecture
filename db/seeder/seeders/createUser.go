@@ -2,6 +2,7 @@ package seeders
 
 import (
 	"business/db/model"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +16,7 @@ func CreateUser(tx *gorm.DB) error {
 			HiraganaLastName:  "たかはし",
 			HiraganaFirstName: "たろう",
 			Email:             "abc@co.jp",
-			Password:          "パスワード",
+			Password:          encrypt("パスワード"),
 			CreatedUserID:     0,
 			UpdateUserID:      0,
 		},
@@ -25,7 +26,7 @@ func CreateUser(tx *gorm.DB) error {
 			HiraganaLastName:  "いまい",
 			HiraganaFirstName: "たろう",
 			Email:             "abcd@co.jp",
-			Password:          "パスワード",
+			Password:          encrypt("パスワード"),
 			CreatedUserID:     0,
 			UpdateUserID:      0,
 		},
@@ -39,4 +40,12 @@ func CreateUser(tx *gorm.DB) error {
 	}
 
 	return err
+}
+
+func encrypt(plainText string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plainText), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return string(hash)
 }
