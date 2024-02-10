@@ -4,6 +4,7 @@ import (
 	"business/internal/entity"
 	"business/internal/usecase/auth"
 	"errors"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 	"net/http"
@@ -50,7 +51,7 @@ func (r *AuthRoutes) Authentication(c echo.Context) error {
 			r.l.Error(err, errMsg)
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": errMsg})
 		}
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("%v", err)})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"jwt": jwtToken})

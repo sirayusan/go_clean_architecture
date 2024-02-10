@@ -121,6 +121,7 @@ func TestAuthRoutes_Authentication(t *testing.T) {
 	res = httptest.NewRecorder()
 	c = e.NewContext(req, res)
 	authUsecaseMock.On("GenerateJwtToken", loginRequest).Return("", nil)
+	// 正常系
 	// テスト対象のメソッドを実行
 	if assert.NoError(t, routes.Authentication(c)) {
 		assert.Equal(t, http.StatusBadRequest, res.Code) // HTTPステータスコードの検証
@@ -150,7 +151,6 @@ func TestAuthRoutes_Authentication(t *testing.T) {
 	}
 
 	//異常系: メールアドレスのユーザーが存在しない場合
-	//テスト用のリクエストボディを作成
 	loginRequest = entity.LoginRequest{
 		Mail:     "test@example.com12345",
 		Password: "パスワード",
@@ -170,10 +170,9 @@ func TestAuthRoutes_Authentication(t *testing.T) {
 	}
 
 	//異常系: パスワードが一致しない場合
-	//テスト用のリクエストボディを作成
 	loginRequest = entity.LoginRequest{
 		Mail:     "test@example.com",
-		Password: "存在しないパスワード",
+		Password: "パスワード",
 	}
 	requestBody, _ = json.Marshal(loginRequest)
 	req = httptest.NewRequest(http.MethodPost, "/login", bytes.NewReader(requestBody))
@@ -187,6 +186,25 @@ func TestAuthRoutes_Authentication(t *testing.T) {
 		var response map[string]string
 		json.Unmarshal(res.Body.Bytes(), &response) // レスポンスボディを検証する
 		assert.Equal(t, "ユーザー認証に失敗しました。", response["error"])
+	}
+
+	//異常系: DBとの疎通時に何らかの原因でエラーになった場合
+	loginRequest = entity.LoginRequest{
+		Mail:     "test@example.com",
+		Password: "存在しないパスワード",
+	}
+	requestBody, _ = json.Marshal(loginRequest)
+	req = httptest.NewRequest(http.MethodPost, "/login", bytes.NewReader(requestBody))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	res = httptest.NewRecorder()
+	c = e.NewContext(req, res)
+	authUsecaseMock.On("GenerateJwtToken", loginRequest).Return("", errors.New("DB疎通時の想定外のエラー"))
+	// テスト対象のメソッドを実行
+	if assert.NoError(t, routes.Authentication(c)) {
+		assert.Equal(t, http.StatusInternalServerError, res.Code) // HTTPステータスコードの検証
+		var response map[string]string
+		json.Unmarshal(res.Body.Bytes(), &response) // レスポンスボディを検証する
+		assert.Equal(t, "DB疎通時の想定外のエラー", response["error"])
 	}
 
 }
