@@ -47,6 +47,25 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
 
+  redis:
+    image: "redis:latest"
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - "redis-data:/data"
+
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    ports:
+      - ${REDIS_DEBUG_GUI_PORT}:8001
+    volumes:
+      - "redisinsight-data:/db"
+
 volumes:
   db-data:
+    driver: local
+  redis-data:
+    driver: local
+  redisinsight-data:
     driver: local
