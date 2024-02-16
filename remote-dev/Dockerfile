@@ -1,4 +1,8 @@
 FROM golang:1.21.5-bullseye
+
+# Task Runner のインストール
+RUN curl -sL "https://github.com/go-task/task/releases/download/v3.9.0/task_linux_amd64.deb" -o task.deb && dpkg -i task.deb && rm task.deb
+
 ENV GOFLAGS=-buildvcs=false
 ARG USERNAME=go
 ARG GROUPNAME=go
@@ -18,8 +22,14 @@ WORKDIR $APP_ROOT
 COPY go.mod go.sum ./
 RUN go mod download
 COPY remote-dev .
+
 RUN go install github.com/cosmtrek/air@latest
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
+RUN go install github.com/codegangsta/gin@latest
+RUN go install honnef.co/go/tools/cmd/staticcheck@latest
+RUN go install golang.org/x/tools/gopls@latest
+RUN go install github.com/fatih/gomodifytags@latest
+
 ENV EDITOR vim
 RUN curl -fsSL -o ide.tar.gz $IDEURL && \
 rm -rf ide && \
