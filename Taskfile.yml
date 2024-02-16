@@ -1,0 +1,51 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  run-remote-dev:
+    desc: "リモート開発サーバーを起動"
+    cmds:
+      - air -c .air.toml & ide/bin/remote-dev-server.sh run /data --listenOn 0.0.0.0 --port 5994
+
+  migration-drop:
+    desc: "develop schema のテーブルを削除する。"
+    cmds:
+      - go run cmd/migrations/main.go dev drop
+
+  migration-create:
+    desc: "develop schema のテーブル作成する。"
+    cmds:
+      - go run cmd/migrations/main.go dev create
+
+  migration-test-create:
+    desc: "test schema のテーブルを削除する。"
+    cmds:
+      - go run cmd/migrations/main.go test drop
+
+  migration-test-drop:
+    desc: "test schema のテーブルを作成する。"
+    cmds:
+      - go run cmd/migrations/main.go test create
+
+  migration-fresh:
+    desc: "develop schema のテーブルを削除し作成する。"
+    cmds:
+      - task: migration-drop
+      - task: migration-create
+
+  migration-fresh-test:
+    desc: "test schema のテーブルを削除し作成する。"
+    cmds:
+      - task: migration-test-drop
+      - task: migration-test-create
+
+  seed-dev:
+    desc: "develop schema のテーブルにデータを投入する。"
+    cmds:
+      - go run cmd/seeder/main.go dev
+
+  seed-test:
+    desc: "test schema のテーブルにデータを投入する。"
+    cmds:
+      - go run cmd/seeder/main.go dev
