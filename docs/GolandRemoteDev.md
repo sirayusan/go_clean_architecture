@@ -8,7 +8,10 @@ https://qiita.com/BlueBaybridge/items/c1adcf1dab5da2b40b4f
 git clone https://github.com/sirayusan/business.git
 ```
 
-2. `cd remote-dev`
+2. ディレクトリ移動
+```
+cd remote-dev
+```
 
 3. コンテナの構築  
 ```
@@ -21,15 +24,13 @@ docker-compose up -d
 ```
 winpty docker container exec -it remote-dev-go-1 bash
 ```
-5. Docker for Desktopを起動しCLIで以下のコマンドを実行する。  
-※もともとDockerFileに記述していたが、MySQLの起動が遅くエラーになってしまうため手動で実行する。
+5. リモートコンテナを起動し、接続URLを発行する。
 ```
 task run-remote-dev
 ```
-![image](https://github.com/sirayusan/business/assets/73060776/f863ef40-6321-4673-8048-8fc7c4a5181e)
-
-6. goコンテナのログを確認しtcp:// … のリンクをコピーする。
-![image](https://github.com/sirayusan/business/assets/73060776/3b1a7e6f-6208-432a-aaba-b35856388c77)
+![image](https://github.com/sirayusan/go_clean_architecture/assets/73060776/736e1fd5-d090-4518-aa87-060db4c0e103)
+6. tcp:// … のリンクをコピーする。
+![image](https://github.com/sirayusan/go_clean_architecture/assets/73060776/ab4afcc4-b2d4-41e0-aafb-deee680bd9b7)
 
 7. Gatewayを開き`Remote Development`の`connect to Running IDE`にペーストする。
 ![image](https://github.com/sirayusan/business/assets/73060776/86afc3ff-270c-4a86-bb3f-dd15859c9bf8)
