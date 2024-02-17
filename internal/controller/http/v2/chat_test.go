@@ -3,7 +3,6 @@ package v2
 import (
 	"business/db/model"
 	pkgmysql "business/pkg/mysql"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,9 +20,9 @@ type ChatUseCaseMock struct {
 	mock.Mock
 }
 
-func (m *ChatUseCaseMock) GetChats(userID uint32) ([]entity.Chat, error) {
+func (m *ChatUseCaseMock) GetChats(userID uint32) (entity.Chats, error) {
 	args := m.Called(userID)
-	return args.Get(0).([]entity.Chat), args.Error(1)
+	return args.Get(0).(entity.Chats), args.Error(1)
 }
 
 func TestChatRoutes_GetChats(t *testing.T) {
@@ -61,30 +60,29 @@ func TestChatRoutes_GetChats(t *testing.T) {
 		t: chatUsecaseMock,
 		l: loggerMock,
 	}
-
+	chatUsecaseMock.On("GetChats", nil).Return(entity.Chats{}, nil)
 	// テスト対象のメソッドを実行
 	if assert.NoError(t, routes.GetChats(c)) {
 		assert.Equal(t, http.StatusOK, res.Code)
 		// レスポンスボディを検証する
-		var response map[string]string
-		json.Unmarshal(res.Body.Bytes(), &response)
-		assert.Equal(t, "mockedJwtToken", response["jwt"])
+		assert.Equal(t, res.Body, nil)
 	}
 	// モックが期待通りに呼び出されたことを確認
 	chatUsecaseMock.AssertExpectations(t)
 	loggerMock.AssertExpectations(t)
 
-	//異常系(204) :チャットが存在しない場合
+	// 異常系(204) :チャットが存在しない場合
 	jwtToken, err = auth.GenerateToken(uint32(3))
 	assert.NoError(t, err)
 	req.Header.Set("Authorization", "Bearer "+jwtToken)
 	res = httptest.NewRecorder()
 	c = e.NewContext(req, res)
 	// テスト対象のメソッドを実行
+	chatUsecaseMock.On("GetChats", nil).Return(entity.Chats{}, nil) // ここをuint32(3)に修正
 	if assert.NoError(t, routes.GetChats(c)) {
 		assert.Equal(t, http.StatusNoContent, res.Code)
 		// レスポンスボディを検証する
-		assert.Equal(t, res.Body, nil)
+		assert.Equal(t, "", res.Body.String())
 	}
 	// モックが期待通りに呼び出されたことを確認
 	chatUsecaseMock.AssertExpectations(t)

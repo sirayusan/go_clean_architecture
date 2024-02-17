@@ -23,7 +23,7 @@ func TestAuthRepository_GetUserByMail(t *testing.T) {
 
 	// 期待値
 	assertChatList := entity.Chats{
-		List: []entity.Chat{
+		[]entity.Chat{
 			{
 				RecipientUserName: "今井次郎",
 				Message:           func() *string { s := "テスト1"; return &s }(),

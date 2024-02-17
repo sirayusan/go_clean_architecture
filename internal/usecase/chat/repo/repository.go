@@ -16,8 +16,8 @@ func New(db *mysql.MySQL) *ChatRepository {
 }
 
 // GetChatList はチャットリストを取得します。
-func (r *ChatRepository) GetChatList(userID uint32) ([]entity.Chat, error) {
-	var chats []entity.Chat
+func (r *ChatRepository) GetChatList(userID uint32) (entity.Chats, error) {
+	var chats entity.Chats
 	//err := r.DB.Table("users").
 	//	Select(
 	//		"user_id",

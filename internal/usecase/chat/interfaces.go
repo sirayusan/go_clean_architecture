@@ -7,11 +7,11 @@ import (
 type (
 	// Chat -.
 	Chat interface {
-		GetChats(uint32) ([]entity.Chat, error)
+		GetChats(uint32) (entity.Chats, error)
 	}
 
 	// ChatRepo -.
 	ChatRepo interface {
-		GetChatList(uint32) ([]entity.Chat, error)
+		GetChatList(uint32) (entity.Chats, error)
 	}
 )

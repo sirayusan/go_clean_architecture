@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"business/internal/entity"
 	"business/internal/usecase/chat"
 	"business/pkg/logger"
 	"github.com/labstack/echo/v4"
@@ -38,5 +37,5 @@ func (r *ChatRoutes) GetChats(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, entity.Chats{List: chats})
+	return c.JSON(http.StatusOK, chats)
 }

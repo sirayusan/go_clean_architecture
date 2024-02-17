@@ -14,9 +14,9 @@ type MockChatRepo struct {
 	mock.Mock
 }
 
-func (m *MockChatRepo) GetChatList(userID uint32) ([]entity.Chat, error) {
+func (m *MockChatRepo) GetChatList(userID uint32) (entity.Chats, error) {
 	args := m.Called(userID)
-	return args.Get(0).([]entity.Chat), args.Error(1)
+	return args.Get(0).(entity.Chats), args.Error(1)
 }
 
 // Authenticationメソッドのテスト
@@ -25,7 +25,7 @@ func TestAuthentication(t *testing.T) {
 	uc := New(mockRepo)
 
 	chatList := entity.Chats{
-		List: []entity.Chat{
+		[]entity.Chat{
 			{
 				RecipientUserName: "斎藤太郎",
 				Message:           func() *string { s := "テスト1"; return &s }(),
