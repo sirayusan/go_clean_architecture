@@ -24,7 +24,15 @@ func New(r AuthRepo) *AuthUseCase {
 	}
 }
 
-// Authentication は入力値の顧客が存在したら、jwtトークンを生成して返す。
+type StandardClaims struct {
+	Issuer    string
+	IssuedAt  uint32
+	Id        string // ユーザーID
+	ExpiresAt uint32 // 有効期限
+	abc       string
+}
+
+// GenerateJwtToken は入力値の顧客が存在したら、jwtトークンを生成して返す。
 func (uc *AuthUseCase) GenerateJwtToken(param entity.LoginRequest) (string, error) {
 	user, err := uc.repo.GetUserByMail(param.Mail)
 	// DBと疎通できずエラーなのか、存在せずエラー(401)を分ける必要がある。
@@ -50,7 +58,7 @@ func (uc *AuthUseCase) GenerateJwtToken(param entity.LoginRequest) (string, erro
 
 func generateToken(userID uint32) (string, error) {
 	// トークンの有効期限を設定
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(24 * 30 * time.Hour)
 
 	// JWTのクレームを設定
 	claims := &jwt.StandardClaims{
@@ -64,7 +72,7 @@ func generateToken(userID uint32) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// 秘密鍵で署名
-	tokenString, err := token.SignedString([]byte(os.ExpandEnv(":${JWT_SECRET_KEY}")))
+	tokenString, err := token.SignedString([]byte(os.ExpandEnv("${JWT_SECRET_KEY}")))
 	if err != nil {
 		return "", err
 	}

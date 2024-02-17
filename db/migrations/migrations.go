@@ -27,5 +27,7 @@ func CheckArgs() error {
 func CreateArrayMigrationSlice() []interface{} {
 	return []interface{}{
 		model.User{},
+		model.Chat{},
+		model.ChatMessage{},
 	}
 }

@@ -1,40 +1,45 @@
 package v2
 
 import (
-	"business/internal/entity"
-	"business/internal/usecase"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
 
+	"business/internal/entity"
+	user "business/internal/usecase/user"
 	"business/pkg/logger"
 )
 
 type UserRoutes struct {
-	t usecase.User
+	t user.User
 	l logger.Interface
 }
 
-type doTranslateRequest struct {
-	Source      string `json:"source"       binding:"required"  example:"auto"`
-	Destination string `json:"destination"  binding:"required"  example:"en"`
-	Original    string `json:"original"     binding:"required"  example:"текст для перевода"`
-}
-
 // NewUserRoutes はUserRoutesのコンストラクタです
-func NewUserRoutes(t usecase.User, l logger.Interface) *UserRoutes {
-	return &UserRoutes{t, l}
+func NewUserRoutes(g *echo.Group, t user.User, l logger.Interface) {
+	routes := &UserRoutes{t, l}
+	g.GET("/index", routes.getUserList)
+	g.GET("/home", routes.getChatList)
 }
 
-// GetUserList はユーザーリストを取得するエンドポイントのハンドラです
+// getUserList はユーザーリストを取得するエンドポイントのハンドラです
 func (r *UserRoutes) getUserList(c echo.Context) error {
-	userList, err := r.t.UserList(c.Request().Context()) // Echoでリクエストからcontext.Contextを取得
+	userList, err := r.t.UserList()
 	if err != nil {
 		r.l.Error(err, "http - v2 - getUserList")
-		// Echoでエラーレスポンスを送信
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprint(err)})
 	}
 
-	// EchoでJSONレスポンスを送信
+	return c.JSON(http.StatusOK, entity.UserListResponse{UserList: userList})
+}
+
+// getUserList はユーザーリストを取得するエンドポイントのハンドラです
+func (r *UserRoutes) getChatList(c echo.Context) error {
+	userList, err := r.t.UserList()
+	if err != nil {
+		r.l.Error(err, "http - v2 - getUserList")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprint(err)})
+	}
+
 	return c.JSON(http.StatusOK, entity.UserListResponse{UserList: userList})
 }

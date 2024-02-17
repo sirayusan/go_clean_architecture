@@ -1,11 +1,11 @@
 package repo
 
 import (
-	"business/internal/entity"
-	"business/pkg/mysql"
-	"context"
 	"fmt"
 	"gorm.io/gorm"
+
+	"business/internal/entity"
+	"business/pkg/mysql"
 )
 
 type UserRepository struct {
@@ -18,7 +18,7 @@ func New(db *mysql.MySQL) *UserRepository {
 }
 
 // GetUserList はユーザーリストを取得します。
-func (r *UserRepository) GetUserList(ctx context.Context) ([]entity.User, error) {
+func (r *UserRepository) GetUserList() ([]entity.User, error) {
 	var userList []entity.User
 	err := r.DB.Table("users").
 		Select(
@@ -27,7 +27,7 @@ func (r *UserRepository) GetUserList(ctx context.Context) ([]entity.User, error)
 			"first_name",
 		).
 		Find(&userList).
-		Error // GORMのTableメソッドを使用
+		Error
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user list: %w", err)
