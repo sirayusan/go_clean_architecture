@@ -5,6 +5,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"net/http"
 	"os"
+	"time"
 
 	authusecase "business/internal/usecase/auth"
 	authrepo "business/internal/usecase/auth/repo"
@@ -76,6 +77,11 @@ func jwtMiddleware() echo.MiddlewareFunc {
 			claims, ok := token.Claims.(*jwt.StandardClaims)
 			if !ok {
 				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid JWT claims22")
+			}
+
+			// トークンの有効期限が現在時刻を過ぎていないか確認
+			if claims.ExpiresAt < time.Now().Unix() {
+				return echo.NewHTTPError(http.StatusUnauthorized, "JWT token has expired")
 			}
 
 			// EchoのContextにユーザーIDを設定
