@@ -30,6 +30,16 @@ func CreateUser(tx *gorm.DB) error {
 			CreatedUserID:     0,
 			UpdateUserID:      0,
 		},
+		{
+			LastName:          "今井",
+			FirstName:         "次郎",
+			HiraganaLastName:  "いまい",
+			HiraganaFirstName: "たろう",
+			Email:             "abcde@co.jp",
+			Password:          encrypt("123456"),
+			CreatedUserID:     0,
+			UpdateUserID:      0,
+		},
 	}
 
 	for _, user := range users {
