@@ -3,9 +3,9 @@ package entity
 import "time"
 
 type Chat struct {
-	RecipientUserName string     `json:"recipient_user_name"`
-	Message           *string    `json:"message"`
-	CreateAt          *time.Time `json:"create_at"`
+	UserName  string     `json:"user_name"`
+	Message   *string    `json:"message"`
+	CreatedAt *time.Time `json:"created_at"`
 }
 
 type Chats struct {

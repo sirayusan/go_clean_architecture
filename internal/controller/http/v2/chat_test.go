@@ -3,13 +3,14 @@ package v2
 import (
 	"business/db/model"
 	pkgmysql "business/pkg/mysql"
+	"encoding/json"
+	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"business/internal/entity"
 	"business/pkg/auth"
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -25,6 +26,7 @@ func (m *ChatUseCaseMock) GetChats(userID uint32) (entity.Chats, error) {
 	return args.Get(0).(entity.Chats), args.Error(1)
 }
 
+// TestChatRoutes_GetChats は正常系のテスト
 func TestChatRoutes_GetChats(t *testing.T) {
 	// テスト用のデータベース接続を作成
 	conn, err := pkgmysql.NewTest()
@@ -37,8 +39,6 @@ func TestChatRoutes_GetChats(t *testing.T) {
 
 	// Echoのインスタンスを生成
 	e := echo.New()
-	// カスタムバリデーターをechoインスタンスに登録
-	e.Validator = &DefaultValidator{validator: validator.New()}
 
 	// モックのusecaseとloggerを作成
 	chatUsecaseMock := new(ChatUseCaseMock)
@@ -60,33 +60,99 @@ func TestChatRoutes_GetChats(t *testing.T) {
 		t: chatUsecaseMock,
 		l: loggerMock,
 	}
-	chatUsecaseMock.On("GetChats", nil).Return(entity.Chats{}, nil)
+	assertChatList := entity.Chats{
+		List: []entity.Chat{
+			{
+				UserName: "今井次郎",
+				Message:  func() *string { s := "テスト1"; return &s }(),
+			},
+			{
+				UserName: "斎藤三郎",
+				Message:  func() *string { s := "テスト2"; return &s }(),
+			},
+		},
+	}
+
+	chatUsecaseMock.On("GetChats", uint32(0)).Return(assertChatList, nil)
 	// テスト対象のメソッドを実行
 	if assert.NoError(t, routes.GetChats(c)) {
 		assert.Equal(t, http.StatusOK, res.Code)
-		// レスポンスボディを検証する
-		assert.Equal(t, res.Body, nil)
+		// レスポンスボディを entity.Chats 型にアンマーシャル
+		var actualChatList entity.Chats
+		err := json.Unmarshal(res.Body.Bytes(), &actualChatList)
+		assert.NoError(t, err)
+
+		// アンマーシャルしたレスポンスボディを期待値と比較
+		assert.Equal(t, assertChatList, actualChatList)
 	}
 	// モックが期待通りに呼び出されたことを確認
 	chatUsecaseMock.AssertExpectations(t)
 	loggerMock.AssertExpectations(t)
 
-	// 異常系(204) :チャットが存在しない場合
-	jwtToken, err = auth.GenerateToken(uint32(3))
+	defer func() {
+		err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+		assert.NoError(t, err)
+		err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+		assert.NoError(t, err)
+	}()
+}
+
+// TestChatRoutes_GetChats_Failed は異常系(204) :チャットが存在しない場合のテスト
+func TestChatRoutes_GetChats_Failed(t *testing.T) {
+	// テスト用のデータベース接続を作成
+	conn, err := pkgmysql.NewTest()
+	assert.NoError(t, err)
+	err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+	assert.NoError(t, err)
+	err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+	assert.NoError(t, err)
+	CreateData(conn, t)
+
+	// Echoのインスタンスを生成
+	e := echo.New()
+
+	// モックのusecaseとloggerを作成
+	chatUsecaseMock := new(ChatUseCaseMock)
+	loggerMock := new(MockLogger)
+
+	// テスト用のHTTPリクエストを作成
+	req := httptest.NewRequest(http.MethodGet, "/chats", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	jwtToken, err := auth.GenerateToken(uint32(1))
 	assert.NoError(t, err)
 	req.Header.Set("Authorization", "Bearer "+jwtToken)
-	res = httptest.NewRecorder()
-	c = e.NewContext(req, res)
+	// レスポンスを記録するためのResponseRecorderを作成
+	res := httptest.NewRecorder()
+	// 新しいEchoコンテキストを生成
+	c := e.NewContext(req, res)
+
+	// AuthRoutesのインスタンスを作成
+	routes := ChatRoutes{
+		t: chatUsecaseMock,
+		l: loggerMock,
+	}
+	chatUsecaseMock.On("GetChats", uint32(0)).Return(entity.Chats{}, gorm.ErrRecordNotFound)
 	// テスト対象のメソッドを実行
-	chatUsecaseMock.On("GetChats", nil).Return(entity.Chats{}, nil) // ここをuint32(3)に修正
 	if assert.NoError(t, routes.GetChats(c)) {
 		assert.Equal(t, http.StatusNoContent, res.Code)
-		// レスポンスボディを検証する
-		assert.Equal(t, "", res.Body.String())
+		// レスポンスボディを entity.Chats 型にアンマーシャル
+		var response map[string]string
+		err := json.Unmarshal(res.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		// アンマーシャルしたレスポンスボディを期待値と比較
+		assert.Equal(t, "record not found", response["error"])
 	}
 	// モックが期待通りに呼び出されたことを確認
 	chatUsecaseMock.AssertExpectations(t)
 	loggerMock.AssertExpectations(t)
+
+	defer func() {
+		err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+		assert.NoError(t, err)
+		err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+		assert.NoError(t, err)
+	}()
 }
 
 func CreateData(conn *pkgmysql.MySQL, t *testing.T) {

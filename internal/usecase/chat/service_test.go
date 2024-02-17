@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"testing"
 
@@ -25,24 +26,31 @@ func TestAuthentication(t *testing.T) {
 	uc := New(mockRepo)
 
 	chatList := entity.Chats{
-		[]entity.Chat{
+		List: []entity.Chat{
 			{
-				RecipientUserName: "斎藤太郎",
-				Message:           func() *string { s := "テスト1"; return &s }(),
+				UserName: "斎藤太郎",
+				Message:  func() *string { s := "テスト1"; return &s }(),
 			},
 		},
 	}
 
 	// 正常系
-	mockRepo.On("GetChatList", "test@example.com").Return(chatList, nil)
+	mockRepo.On("GetChatList", uint32(1)).Return(chatList, nil)
 	chats, err := uc.GetChats(uint32(1))
 	assert.NoError(t, err)
 	assert.NotEmpty(t, chats)
 
 	// 異常系
-	mockRepo.On("GetChatList", "test@example.com").Return(entity.Chats{}, gorm.ErrRecordNotFound)
+	mockRepo.On("GetChatList", uint32(0)).Return(entity.Chats{}, gorm.ErrRecordNotFound) // int32(0)からuint32(0)へ修正
 	chats, err = uc.GetChats(uint32(0))
 	assert.Error(t, err)
 	assert.Empty(t, chats)
-	assert.Equal(t, err, gorm.ErrRecordNotFound)
+	assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
+
+	// 500異常系
+	mockRepo.On("GetChatList", uint32(2)).Return(entity.Chats{}, errors.New("予期せぬエラー"))
+	chats, err = uc.GetChats(uint32(2))
+	assert.Error(t, err)
+	assert.Empty(t, chats)
+	assert.EqualError(t, err, "GetChats - s.repo.GetChatList: 予期せぬエラー")
 }

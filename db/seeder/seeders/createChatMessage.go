@@ -17,7 +17,7 @@ func CreateChatMessage(tx *gorm.DB) error {
 		{
 			ChatID:       uint32(1),
 			Message:      "テスト2",
-			SenderUserID: uint32(1),
+			SenderUserID: uint32(2),
 		},
 		{
 			ChatID:       uint32(2),
@@ -27,7 +27,7 @@ func CreateChatMessage(tx *gorm.DB) error {
 		{
 			ChatID:       uint32(2),
 			Message:      "テスト4",
-			SenderUserID: uint32(1),
+			SenderUserID: uint32(3),
 		},
 	}
 

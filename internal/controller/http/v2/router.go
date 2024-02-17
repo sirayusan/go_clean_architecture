@@ -81,7 +81,7 @@ func jwtMiddleware() echo.MiddlewareFunc {
 			}
 
 			// EchoのContextにユーザーIDを設定
-			c.Set("user_id", claims.Id)
+			c.Set("userID", claims.Id)
 
 			// トークンが有効な場合は次のハンドラーに処理を渡す
 			return next(c)

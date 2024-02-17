@@ -31,8 +31,8 @@ func CreateUser(tx *gorm.DB) error {
 			UpdateUserID:      0,
 		},
 		{
-			LastName:          "今井",
-			FirstName:         "次郎",
+			LastName:          "斎藤",
+			FirstName:         "三郎",
 			HiraganaLastName:  "いまい",
 			HiraganaFirstName: "たろう",
 			Email:             "abcde@co.jp",

@@ -1,14 +1,17 @@
 package repo
 
 import (
+	"testing"
+	"time"
+
 	"business/db/model"
 	"business/internal/entity"
 	pkgmysql "business/pkg/mysql"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestAuthRepository_GetUserByMail(t *testing.T) {
+
 	// テスト用のデータベース接続を作成
 	conn, err := pkgmysql.NewTest()
 	assert.NoError(t, err)
@@ -18,19 +21,28 @@ func TestAuthRepository_GetUserByMail(t *testing.T) {
 	assert.NoError(t, err)
 	CreateData(conn, t)
 
+	defer func() {
+		err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+		assert.NoError(t, err)
+		err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+		assert.NoError(t, err)
+	}()
+
 	// リポジトリのインスタンスを作成
 	repo := New(conn)
 
 	// 期待値
 	assertChatList := entity.Chats{
-		[]entity.Chat{
+		List: []entity.Chat{
 			{
-				RecipientUserName: "今井次郎",
-				Message:           func() *string { s := "テスト1"; return &s }(),
+				UserName:  "今井次郎",
+				Message:   func() *string { s := "テスト2"; return &s }(),
+				CreatedAt: func() *time.Time { time_ := time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local); return &time_ }(),
 			},
 			{
-				RecipientUserName: "斎藤三郎",
-				Message:           func() *string { s := "テスト2"; return &s }(),
+				UserName:  "斎藤三郎",
+				Message:   func() *string { s := "テスト3"; return &s }(),
+				CreatedAt: func() *time.Time { time_ := time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local); return &time_ }(),
 			},
 		},
 	}
@@ -41,14 +53,9 @@ func TestAuthRepository_GetUserByMail(t *testing.T) {
 	assert.Equal(t, chatList, assertChatList)
 
 	// 異常系:データが存在しないパターン
-	chatList, err = repo.GetChatList(uint32(0))
+	chatList, err = repo.GetChatList(uint32(10))
 	assert.Error(t, err)
 	assert.Empty(t, chatList)
-
-	err = conn.DB.Migrator().DropTable(model.User{})
-	assert.NoError(t, err)
-	err = conn.DB.AutoMigrate(model.User{})
-	assert.NoError(t, err)
 }
 
 func CreateData(conn *pkgmysql.MySQL, t *testing.T) {
@@ -115,11 +122,19 @@ func CreateData(conn *pkgmysql.MySQL, t *testing.T) {
 			ChatID:       1,
 			Message:      "テスト1",
 			SenderUserID: 1,
+			CreatedAt:    time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local),
 		},
 		{
 			ChatID:       1,
 			Message:      "テスト2",
+			SenderUserID: 1,
+			CreatedAt:    time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local),
+		},
+		{
+			ChatID:       2,
+			Message:      "テスト3",
 			SenderUserID: 3,
+			CreatedAt:    time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local),
 		},
 	}
 	for _, chatMessage := range ChatMessageList {
