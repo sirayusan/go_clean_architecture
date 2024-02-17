@@ -5,11 +5,14 @@ import (
 	"github.com/golang-jwt/jwt"
 	"net/http"
 	"os"
+	"time"
 
-	"business/internal/usecase"
 	authusecase "business/internal/usecase/auth"
 	authrepo "business/internal/usecase/auth/repo"
-	"business/internal/usecase/repo"
+	chatusecase "business/internal/usecase/chat"
+	chatrepo "business/internal/usecase/chat/repo"
+	user "business/internal/usecase/user"
+	"business/internal/usecase/user/repo"
 	"business/pkg/logger"
 	"business/pkg/mysql"
 	"github.com/labstack/echo/v4"
@@ -20,18 +23,12 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	UserUseCase := usecase.New(
-		repo.New(conn),
-	)
-	// UserRoutesのインスタンスを作成
-	userRouteHandlers := NewUserRoutes(UserUseCase, l)
 	u := e.Group("/user")
-	u.GET("/index", userRouteHandlers.getUserList)
+	u.Use(jwtMiddleware())
 
-	authUseCase := authusecase.New(
-		authrepo.New(conn),
-	)
-	NewAuthRouter(e, authUseCase, l)
+	NewUserRoutes(u, user.New(repo.New(conn)), l)
+	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
+	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
 
 	// ログイン後URL
 	e.POST("/home", func(c echo.Context) error {
@@ -78,8 +75,13 @@ func jwtMiddleware() echo.MiddlewareFunc {
 				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid JWT claims22")
 			}
 
+			// トークンの有効期限が現在時刻を過ぎていないか確認
+			if claims.ExpiresAt < time.Now().Unix() {
+				return echo.NewHTTPError(http.StatusUnauthorized, "JWT token has expired")
+			}
+
 			// EchoのContextにユーザーIDを設定
-			c.Set("user_id", claims.Id)
+			c.Set("userID", claims.Id)
 
 			// トークンが有効な場合は次のハンドラーに処理を渡す
 			return next(c)

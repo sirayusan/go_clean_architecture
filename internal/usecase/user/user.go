@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"context"
 	"fmt"
 
 	"business/internal/entity"
@@ -20,8 +19,8 @@ func New(r UserRepo) *UserUseCase {
 }
 
 // UserList - getting translate history from store.
-func (uc *UserUseCase) UserList(ctx context.Context) ([]entity.User, error) {
-	translations, err := uc.repo.GetUserList(ctx)
+func (uc *UserUseCase) UserList() ([]entity.User, error) {
+	translations, err := uc.repo.GetUserList()
 	if err != nil {
 		return nil, fmt.Errorf("TranslationUseCase - History - s.repo.GetHistory: %w", err)
 	}
