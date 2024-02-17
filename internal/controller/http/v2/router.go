@@ -9,6 +9,8 @@ import (
 
 	authusecase "business/internal/usecase/auth"
 	authrepo "business/internal/usecase/auth/repo"
+	chatusecase "business/internal/usecase/chat"
+	chatrepo "business/internal/usecase/chat/repo"
 	user "business/internal/usecase/user"
 	"business/internal/usecase/user/repo"
 	"business/pkg/logger"
@@ -21,18 +23,12 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// UserRoutesのインスタンスを作成
-	UserUseCase := user.New(
-		repo.New(conn),
-	)
 	u := e.Group("/user")
 	u.Use(jwtMiddleware())
-	NewUserRoutes(u, UserUseCase, l)
 
-	authUseCase := authusecase.New(
-		authrepo.New(conn),
-	)
-	NewAuthRouter(e, authUseCase, l)
+	NewUserRoutes(u, user.New(repo.New(conn)), l)
+	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
+	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
 
 	// ログイン後URL
 	e.POST("/home", func(c echo.Context) error {

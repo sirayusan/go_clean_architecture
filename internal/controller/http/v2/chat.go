@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 
@@ -25,19 +27,16 @@ func NewChatRouter(e *echo.Echo, t usecase.Chat, l logger.Interface) {
 
 // GetChats はユーザーリストを取得するエンドポイントのハンドラです
 func (r *ChatRoutes) GetChats(c echo.Context) error {
-	userIDStr, ok := c.Get("userID").(string)
-	if !ok {
-		// userIDが文字列ではない場合
-		return echo.NewHTTPError(http.StatusBadRequest, "userID must be a string")
-	}
-
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		// 文字列から整数への変換に失敗した場合のエラー処理
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid userID")
-	}
+	userIDStr, _ := c.Get("userID").(string)
+	userID, _ := strconv.Atoi(userIDStr)
 
 	chats, err := r.t.GetChats(uint32(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusNoContent, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
 
 	return c.JSON(http.StatusOK, entity.Chats{List: chats})
 }

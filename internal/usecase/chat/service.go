@@ -1,5 +1,7 @@
 package usecase
 
+import "business/internal/entity"
+
 // ChatUseCase -.
 type ChatUseCase struct {
 	repo ChatRepo
@@ -21,7 +23,8 @@ type StandardClaims struct {
 }
 
 // GetChats はチャット一覧を取得して返す。
-func (uc *ChatUseCase) GetChats(userID uint32) (string, error) {
+func (uc *ChatUseCase) GetChats(userID uint32) ([]entity.Chat, error) {
+	var chatList []entity.Chat
 	//user, err := uc.repo.GetUserByMail(param.Mail)
 	//// DBと疎通できずエラーなのか、存在せずエラー(401)を分ける必要がある。
 	//if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
@@ -43,5 +46,5 @@ func (uc *ChatUseCase) GetChats(userID uint32) (string, error) {
 	//	return "", errors.New("invalid password")
 	//}
 
-	return "", nil
+	return chatList, nil
 }

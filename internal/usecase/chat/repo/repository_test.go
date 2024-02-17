@@ -12,9 +12,9 @@ func TestAuthRepository_GetUserByMail(t *testing.T) {
 	// テスト用のデータベース接続を作成
 	conn, err := pkgmysql.NewTest()
 	assert.NoError(t, err)
-	err = conn.DB.Migrator().DropTable(model.Chat{})
+	err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
 	assert.NoError(t, err)
-	err = conn.DB.AutoMigrate(model.Chat{})
+	err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
 	assert.NoError(t, err)
 	CreateData(conn, t)
 
