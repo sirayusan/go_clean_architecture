@@ -3,6 +3,16 @@
 version: '3'
 
 tasks:
+  run:
+    desc: "リモートコンテナ tcpリンク発行"
+    cmds:
+      - ide/bin/remote-dev-server.sh run /data --listenOn 0.0.0.0 --port 5994
+
+  air:
+    desc: "ホットリロード 起動"
+    cmds:
+      - air -c .air.toml
+
   run-remote-dev:
     desc: "リモート開発サーバーを起動"
     cmds:
