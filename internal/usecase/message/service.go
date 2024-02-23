@@ -20,11 +20,12 @@ func New(r MessageRepo) *MessageUseCase {
 }
 
 // GetMessages はチャット一覧を取得して返す。
-func (uc *MessageUseCase) GetMessages(userID uint32) (entity.Messages, error) {
-	chats, err := uc.repo.GetMessageList(userID)
+func (uc *MessageUseCase) GetMessages(chatID uint32) (entity.Messages, error) {
+	var chats entity.Messages
+	_, err := uc.repo.GetMessageList(chatID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return entity.Messages{}, err
+			return chats, nil
 		}
 		return entity.Messages{}, fmt.Errorf("GetMessages - s.repo.GetMessageList: %w", err)
 	}

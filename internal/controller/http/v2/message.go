@@ -3,9 +3,11 @@ package v2
 import (
 	"business/internal/usecase/message"
 	"business/pkg/logger"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type MessageRoutes struct {
@@ -44,28 +46,41 @@ func (client *Client) Send(msg []byte) error {
 	return client.Ws.WriteMessage(websocket.TextMessage, msg)
 }
 
-var upgrader = websocket.Upgrader{}
+var upGrade = websocket.Upgrader{}
 var rooms = Rooms{}
 
 // NewMessageRouter はチャット関連のURLからコントローラーを実行します。
 func NewMessageRouter(e *echo.Echo, t usecase.Message, l logger.Interface) {
-	//routes := &MessageRoutes{t, l}
-	e.GET("/message", handleConnections)
+	routes := &MessageRoutes{t, l}
+	e.GET("/chats/:id", routes.handleConnections)
 }
 
-func handleConnections(c echo.Context) error {
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+func (r *MessageRoutes) handleConnections(c echo.Context) error {
+	chatIDStr := c.Param("id")
+	chatID, err := strconv.Atoi(chatIDStr)
+	if err != nil {
+		fmt.Printf("不正なリクエストパラメータ \n")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "不正なリクエストパラメータです。"})
+	}
 
+	upGrade.CheckOrigin = func(r *http.Request) bool { return true }
+	ws, err := upGrade.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		c.Logger().Error(err)
 	}
 
 	defer ws.Close()
-
 	client := &Client{Ws: ws}
-
 	rooms.AddClient(client)
+
+	MessagesList, err := r.t.GetMessages(uint32(chatID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	// TODO 受信メッセージを画面にすべてJson形式で返す。
+	for _, data := range MessagesList.List {
+		client.Send([]byte(data.Messages))
+	}
 
 	for {
 		_, msg, err := ws.ReadMessage()
