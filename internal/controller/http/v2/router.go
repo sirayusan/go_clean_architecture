@@ -11,6 +11,8 @@ import (
 	authrepo "business/internal/usecase/auth/repo"
 	chatusecase "business/internal/usecase/chat"
 	chatrepo "business/internal/usecase/chat/repo"
+	massageusecase "business/internal/usecase/message"
+	massagerepo "business/internal/usecase/message/repo"
 	user "business/internal/usecase/user"
 	"business/internal/usecase/user/repo"
 	"business/pkg/logger"
@@ -29,6 +31,7 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
 	NewUserRoutes(u, user.New(repo.New(conn)), l)
 	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
 	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
+	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn)), l)
 
 	// ログイン後URL
 	e.POST("/home", func(c echo.Context) error {
