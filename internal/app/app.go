@@ -1,6 +1,7 @@
 package app
 
 import (
+	"business/pkg/redis"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"os"
@@ -44,5 +45,7 @@ func Run(cfg *config.Config) {
 		l.Fatal(fmt.Errorf("app - Run - mysql.New: %w", err))
 	}
 
-	v2.NewRouter(e, conn, l)
+	rdb := redis.NewRedis()
+
+	v2.NewRouter(e, conn, rdb, l)
 }

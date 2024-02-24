@@ -27,7 +27,7 @@ func Seed(tx *gorm.DB) error {
 	if err = seeders.CreateUser(tx); err != nil {
 		return err
 	}
-	if err = seeders.CreateChat(tx); err != nil {
+	if err = seeders.CreateChatRoom(tx); err != nil {
 		return err
 	}
 	if err = seeders.CreateChatMessage(tx); err != nil {

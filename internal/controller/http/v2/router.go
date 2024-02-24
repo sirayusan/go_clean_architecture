@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/redis/go-redis/v9"
 	"net/http"
 	"os"
 	"time"
@@ -11,6 +12,8 @@ import (
 	authrepo "business/internal/usecase/auth/repo"
 	chatusecase "business/internal/usecase/chat"
 	chatrepo "business/internal/usecase/chat/repo"
+	massageusecase "business/internal/usecase/room"
+	massagerepo "business/internal/usecase/room/repo"
 	user "business/internal/usecase/user"
 	"business/internal/usecase/user/repo"
 	"business/pkg/logger"
@@ -19,7 +22,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
+func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Interface) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -29,6 +32,7 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
 	NewUserRoutes(u, user.New(repo.New(conn)), l)
 	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
 	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
+	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn)), l)
 
 	// ログイン後URL
 	e.POST("/home", func(c echo.Context) error {
