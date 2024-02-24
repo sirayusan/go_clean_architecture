@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/redis/go-redis/v9"
 	"net/http"
 	"os"
 	"time"
@@ -21,7 +22,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(e *echo.Echo, conn *mysql.MySQL, l logger.Interface) {
+func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Interface) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
