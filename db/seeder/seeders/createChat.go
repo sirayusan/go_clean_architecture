@@ -5,19 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-// CreateChat　はサンプルデータを投入する。
-func CreateChat(tx *gorm.DB) error {
+// CreateChatRoom　はサンプルデータを投入する。
+func CreateChatRoom(tx *gorm.DB) error {
 	var err error
-	chats := []model.Chat{
+	chats := []model.ChatRoom{
 		{
-			ChatID:  uint32(1),
-			UserID1: 1,
-			UserID2: 2,
+			ChatRoomID: uint32(1),
+			UserID1:    1,
+			UserID2:    2,
 		},
 		{
-			ChatID:  uint32(2),
-			UserID1: 1,
-			UserID2: 3,
+			ChatRoomID: uint32(2),
+			UserID1:    1,
+			UserID2:    3,
 		},
 	}
 

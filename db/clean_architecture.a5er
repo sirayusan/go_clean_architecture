@@ -68,27 +68,27 @@ Position="MAIN",100,100,561,370
 ZOrder=1
 
 [Entity]
-PName=chats
-LName=チャット
+PName=chat_rooms
+LName=チャットルーム
 Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
 Left=1050
 Top=200
-Field="チャットID","chat_id","int unsinged,auto_increment ","NOT NULL",0,"","",$FFFFFFFF,""
+Field="チャットID","chat_room_id","int unsinged,auto_increment ","NOT NULL",0,"","",$FFFFFFFF,""
 Field="ユーザーID1","user_id1","int unsinged","NOT NULL",,"","",$FFFFFFFF,""
 Field="ユーザーID2","user_id2","int unsinged","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20240217122949
+ModifiedDateTime=20240224151414
 Position="MAIN",1050,200,278,138
 ZOrder=4
 
 [Relation]
 Entity1=users
-Entity2=chats
+Entity2=chat_rooms
 RelationType1=2
 RelationType2=3
 Fields1=user_id
@@ -111,7 +111,7 @@ ZOrder=5
 
 [Relation]
 Entity1=users
-Entity2=chats
+Entity2=chat_rooms
 RelationType1=2
 RelationType2=3
 Fields1=user_id
@@ -142,7 +142,7 @@ Page=MAIN
 Left=1550
 Top=200
 Field="チャットメッセージID","chat__message_id","int unsigned,auto increment","NOT NULL",0,"","",$FFFFFFFF,""
-Field="チャットID","chat_id","int unsigned","NOT NULL",,"","",$FFFFFFFF,""
+Field="チャットID","chat_room_id","int unsigned","NOT NULL",,"","",$FFFFFFFF,""
 Field="メッセージ内容","message","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="送信者ID","sender_id","int unsigned","NOT NULL",,"","",$FFFFFFFF,""
 Field="既読フラグ","is_read","boolean","NOT NULL",,"","",$FFFFFFFF,""
@@ -151,17 +151,17 @@ Field="削除日時","deleted_at","TIMESTAMP",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20240217124019
+ModifiedDateTime=20240224151423
 Position="MAIN",1550,200,384,238
 ZOrder=7
 
 [Relation]
-Entity1=chats
+Entity1=chat_rooms
 Entity2=chat__messages
 RelationType1=2
 RelationType2=3
-Fields1=chat_id
-Fields2=chat_id
+Fields1=chat_room_id
+Fields2=chat_room_id
 Cardinarity1=
 Cardinarity2=
 Position="MAIN",9,4753,5247,2756,R,R,""
