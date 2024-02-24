@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"business/internal/entity"
-	"business/internal/usecase/message"
+	"business/internal/usecase/room"
 	"business/pkg/logger"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -54,11 +54,13 @@ func (r *MessageRoutes) handleConnections(c echo.Context) error {
 		}
 	}()
 
+	// リクエストをルームに参加させる。
 	err = r.t.JoinRoom(chatRoomID, ws, roomManager)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
+	// ルーム参加者からのメッセージを検知し送信する。
 	r.t.PubSub(c, ws, roomManager, chatRoomID)
 
 	return nil

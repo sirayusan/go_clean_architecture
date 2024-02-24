@@ -18,12 +18,12 @@ func (rooms *ChatRoom) AddClient(client *Client) {
 }
 
 func (rooms *ChatRoom) GetClients() []Client {
-	var cs []Client
+	var c []Client
 	for _, client := range rooms.Clients {
-		cs = append(cs, *client)
+		c = append(c, *client)
 	}
 
-	return cs
+	return c
 }
 
 func (rooms *ChatRoom) Publish(msg []byte) {

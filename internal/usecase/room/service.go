@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
 
 	"business/internal/entity"
 	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -24,17 +24,17 @@ func New(r MessageRepo) *MessageUseCase {
 }
 
 // GetMessages はチャット一覧を取得して返す。
-func (uc *MessageUseCase) GetMessages(chatID uint32) (entity.Messages, error) {
-	var chats entity.Messages
-	chats, err := uc.repo.GetMessageList(chatID)
+func (uc *MessageUseCase) GetMessages(chatID uint32) ([]entity.Message, error) {
+	var messageList []entity.Message
+	messageList, err := uc.repo.GetMessageList(chatID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return chats, nil
+			return []entity.Message{}, nil
 		}
-		return entity.Messages{}, fmt.Errorf("GetMessages - s.repo.GetMessageList: %w", err)
+		return []entity.Message{}, fmt.Errorf("GetMessages - s.repo.GetMessageList: %w", err)
 	}
 
-	return chats, nil
+	return messageList, nil
 }
 
 // JoinRoom は参加ルームを判定して追加し、メッセージ一覧を参加者へ送信する。
@@ -53,19 +53,22 @@ func (uc *MessageUseCase) JoinRoom(
 		roomManager[chatRoomID] = &newRoom
 	}
 
-	messages, err := uc.repo.GetMessageList(chatRoomID)
+	messageList, err := uc.repo.GetMessageList(chatRoomID)
 
 	// レコードが存在しないエラーは許容する。
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("GetMessages - s.repo.GetMessageList: %w", err)
 	}
 
-	for _, data := range messages.List {
-		json, err := json.Marshal(data)
+	for _, data := range messageList {
+		_json, err := json.Marshal(data)
 		if err != nil {
 			return err
 		}
-		client.Send(json)
+		err = client.Send(_json)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

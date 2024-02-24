@@ -17,8 +17,8 @@ func New(db *mysql.MySQL) *ChatRepository {
 }
 
 // GetMessageList はチャットに紐づくメッセージ一覧を取得します。
-func (r *ChatRepository) GetMessageList(chatRoomID uint32) (entity.Messages, error) {
-	var chatList []entity.Message
+func (r *ChatRepository) GetMessageList(chatRoomID uint32) ([]entity.Message, error) {
+	var messageList []entity.Message
 	err := r.DB.Table("chat_messages cm").
 		Select(`
 			cm.chat_message_id,
@@ -28,12 +28,12 @@ func (r *ChatRepository) GetMessageList(chatRoomID uint32) (entity.Messages, err
 		`).
 		Joins(`INNER JOIN users u ON u.user_id = cm.sender_user_id`).
 		Where(`cm.chat_room_id = ?`, chatRoomID).
-		Find(&chatList).
+		Find(&messageList).
 		Error
 
 	if err != nil {
-		return entity.Messages{}, fmt.Errorf("DB serveer Error : %w", err)
+		return []entity.Message{}, fmt.Errorf("DB serveer Error : %w", err)
 	}
 
-	return entity.Messages{List: chatList}, nil
+	return messageList, nil
 }
