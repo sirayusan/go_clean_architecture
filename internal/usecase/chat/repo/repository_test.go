@@ -32,17 +32,19 @@ func TestAuthRepository_GetUserByMail(t *testing.T) {
 	repo := New(conn)
 
 	// 期待値
-	assertChatList := entity.Chats{
-		List: []entity.Chat{
+	assertChatList := entity.ChatRooms{
+		List: []entity.Room{
 			{
-				UserName:  "今井次郎",
-				Message:   func() *string { s := "テスト2"; return &s }(),
-				CreatedAt: func() *time.Time { time_ := time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local); return &time_ }(),
+				ChatRoomID: 1,
+				UserName:   "今井次郎",
+				Message:    func() *string { s := "テスト2"; return &s }(),
+				CreatedAt:  func() *time.Time { time_ := time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local); return &time_ }(),
 			},
 			{
-				UserName:  "斎藤三郎",
-				Message:   func() *string { s := "テスト3"; return &s }(),
-				CreatedAt: func() *time.Time { time_ := time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local); return &time_ }(),
+				ChatRoomID: 2,
+				UserName:   "斎藤三郎",
+				Message:    func() *string { s := "テスト3"; return &s }(),
+				CreatedAt:  func() *time.Time { time_ := time.Date(2023, time.June, 19, 0, 0, 0, 0, time.Local); return &time_ }(),
 			},
 		},
 	}

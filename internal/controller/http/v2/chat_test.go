@@ -21,9 +21,9 @@ type ChatUseCaseMock struct {
 	mock.Mock
 }
 
-func (m *ChatUseCaseMock) GetChats(userID uint32) (entity.Chats, error) {
+func (m *ChatUseCaseMock) GetChats(userID uint32) (entity.ChatRooms, error) {
 	args := m.Called(userID)
-	return args.Get(0).(entity.Chats), args.Error(1)
+	return args.Get(0).(entity.ChatRooms), args.Error(1)
 }
 
 // TestChatRoutes_GetChats は正常系のテスト
@@ -60,15 +60,17 @@ func TestChatRoutes_GetChats(t *testing.T) {
 		t: chatUsecaseMock,
 		l: loggerMock,
 	}
-	assertChatList := entity.Chats{
-		List: []entity.Chat{
+	assertChatList := entity.ChatRooms{
+		List: []entity.Room{
 			{
-				UserName: "今井次郎",
-				Message:  func() *string { s := "テスト1"; return &s }(),
+				ChatRoomID: 1,
+				UserName:   "今井次郎",
+				Message:    func() *string { s := "テスト1"; return &s }(),
 			},
 			{
-				UserName: "斎藤三郎",
-				Message:  func() *string { s := "テスト2"; return &s }(),
+				ChatRoomID: 2,
+				UserName:   "斎藤三郎",
+				Message:    func() *string { s := "テスト2"; return &s }(),
 			},
 		},
 	}
@@ -78,7 +80,7 @@ func TestChatRoutes_GetChats(t *testing.T) {
 	if assert.NoError(t, routes.GetChats(c)) {
 		assert.Equal(t, http.StatusOK, res.Code)
 		// レスポンスボディを entity.Chats 型にアンマーシャル
-		var actualChatList entity.Chats
+		var actualChatList entity.ChatRooms
 		err := json.Unmarshal(res.Body.Bytes(), &actualChatList)
 		assert.NoError(t, err)
 
@@ -131,7 +133,7 @@ func TestChatRoutes_GetChats_Failed(t *testing.T) {
 		t: chatUsecaseMock,
 		l: loggerMock,
 	}
-	chatUsecaseMock.On("GetChats", uint32(0)).Return(entity.Chats{}, gorm.ErrRecordNotFound)
+	chatUsecaseMock.On("GetChats", uint32(0)).Return(entity.ChatRooms{}, gorm.ErrRecordNotFound)
 	// テスト対象のメソッドを実行
 	if assert.NoError(t, routes.GetChats(c)) {
 		assert.Equal(t, http.StatusNoContent, res.Code)

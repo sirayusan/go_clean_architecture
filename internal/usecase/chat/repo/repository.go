@@ -17,8 +17,8 @@ func New(db *mysql.MySQL) *ChatRepository {
 }
 
 // GetChatList はチャットリストを取得します。
-func (r *ChatRepository) GetChatList(userID uint32) (entity.Chats, error) {
-	var chatList []entity.Chat
+func (r *ChatRepository) GetChatList(userID uint32) (entity.ChatRooms, error) {
+	var chatList []entity.Room
 	err := r.DB.Table("chat_rooms c").
 		Select(`
 			DISTINCT
@@ -55,11 +55,11 @@ func (r *ChatRepository) GetChatList(userID uint32) (entity.Chats, error) {
 		Error
 
 	if err != nil {
-		return entity.Chats{}, fmt.Errorf("DB serveer Error : %w", err)
+		return entity.ChatRooms{}, fmt.Errorf("DB serveer Error : %w", err)
 	}
 	if len(chatList) == 0 {
-		return entity.Chats{}, gorm.ErrRecordNotFound
+		return entity.ChatRooms{}, gorm.ErrRecordNotFound
 	}
 
-	return entity.Chats{List: chatList}, nil
+	return entity.ChatRooms{List: chatList}, nil
 }
