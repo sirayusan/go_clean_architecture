@@ -10,22 +10,22 @@ func CreateChatMessage(tx *gorm.DB) error {
 	var err error
 	chatMessages := []model.ChatMessage{
 		{
-			ChatID:       uint32(1),
+			ChatRoomID:   uint32(1),
 			Message:      "テスト1",
 			SenderUserID: uint32(1),
 		},
 		{
-			ChatID:       uint32(1),
+			ChatRoomID:   uint32(1),
 			Message:      "テスト2",
 			SenderUserID: uint32(2),
 		},
 		{
-			ChatID:       uint32(2),
+			ChatRoomID:   uint32(2),
 			Message:      "テスト3",
 			SenderUserID: uint32(1),
 		},
 		{
-			ChatID:       uint32(2),
+			ChatRoomID:   uint32(2),
 			Message:      "テスト4",
 			SenderUserID: uint32(3),
 		},

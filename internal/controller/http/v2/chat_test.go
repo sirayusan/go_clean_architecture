@@ -31,9 +31,9 @@ func TestChatRoutes_GetChats(t *testing.T) {
 	// テスト用のデータベース接続を作成
 	conn, err := pkgmysql.NewTest()
 	assert.NoError(t, err)
-	err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+	err = conn.DB.Migrator().DropTable(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 	assert.NoError(t, err)
-	err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+	err = conn.DB.AutoMigrate(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 	assert.NoError(t, err)
 	CreateData(conn, t)
 
@@ -90,9 +90,9 @@ func TestChatRoutes_GetChats(t *testing.T) {
 	loggerMock.AssertExpectations(t)
 
 	defer func() {
-		err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+		err = conn.DB.Migrator().DropTable(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 		assert.NoError(t, err)
-		err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+		err = conn.DB.AutoMigrate(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 		assert.NoError(t, err)
 	}()
 }
@@ -102,9 +102,9 @@ func TestChatRoutes_GetChats_Failed(t *testing.T) {
 	// テスト用のデータベース接続を作成
 	conn, err := pkgmysql.NewTest()
 	assert.NoError(t, err)
-	err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+	err = conn.DB.Migrator().DropTable(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 	assert.NoError(t, err)
-	err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+	err = conn.DB.AutoMigrate(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 	assert.NoError(t, err)
 	CreateData(conn, t)
 
@@ -148,9 +148,9 @@ func TestChatRoutes_GetChats_Failed(t *testing.T) {
 	loggerMock.AssertExpectations(t)
 
 	defer func() {
-		err = conn.DB.Migrator().DropTable(model.User{}, model.Chat{}, model.ChatMessage{})
+		err = conn.DB.Migrator().DropTable(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 		assert.NoError(t, err)
-		err = conn.DB.AutoMigrate(model.User{}, model.Chat{}, model.ChatMessage{})
+		err = conn.DB.AutoMigrate(model.User{}, model.ChatRoom{}, model.ChatMessage{})
 		assert.NoError(t, err)
 	}()
 }
@@ -197,16 +197,16 @@ func CreateData(conn *pkgmysql.MySQL, t *testing.T) {
 		assert.NoError(t, err)
 	}
 
-	chatList := []model.Chat{
+	chatList := []model.ChatRoom{
 		{
-			ChatID:  1,
-			UserID1: 1,
-			UserID2: 2,
+			ChatRoomID: 1,
+			UserID1:    1,
+			UserID2:    2,
 		},
 		{
-			ChatID:  2,
-			UserID1: 1,
-			UserID2: 3,
+			ChatRoomID: 2,
+			UserID1:    1,
+			UserID2:    3,
 		},
 	}
 	for _, chat := range chatList {
@@ -216,12 +216,12 @@ func CreateData(conn *pkgmysql.MySQL, t *testing.T) {
 
 	ChatMessageList := []model.ChatMessage{
 		{
-			ChatID:       1,
+			ChatRoomID:   1,
 			Message:      "テスト1",
 			SenderUserID: 1,
 		},
 		{
-			ChatID:       1,
+			ChatRoomID:   1,
 			Message:      "テスト2",
 			SenderUserID: 3,
 		},
