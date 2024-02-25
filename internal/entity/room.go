@@ -6,7 +6,7 @@ import (
 )
 
 type Client struct {
-	Ws *websocket.Conn
+	Ws WebSocketConn // WebSocketWrapper から WebSocketConn へ変更
 }
 
 type ChatRoom struct {
@@ -38,18 +38,42 @@ func (client *Client) Send(msg []byte) error {
 
 // MessageResponse -.
 type MessageResponse struct {
-	UserID uint32     `json:":user_id"`
-	List   []Messages `json:"list"`
+	UserID uint32    `json:":user_id"`
+	List   []Message `json:"list"`
 }
 
 // Message -.
 type Message struct {
-	UserName  string    `gorm:"column:user_name"  json:"user_name"`
-	Messages  string    `gorm:"column:message" json:"message"`
-	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	SenderUserID uint32    `gorm:"column:sender_user_id"  json:"sender_user_id"`
+	UserName     string    `gorm:"column:user_name"  json:"user_name"`
+	Messages     string    `gorm:"column:message" json:"message"`
+	CreatedAt    time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
-// Messages -.
-type Messages struct {
-	List []Message `json:"list"`
+// ChatMessage -.
+type ChatMessage struct {
+	ChatMessageID uint32    `gorm:"column:chat_message_id;primaryKey;"`
+	ChatRoomID    uint32    `gorm:"column:chat_room_id"`
+	Message       string    `gorm:"column:message"`
+	SenderUserID  uint32    `gorm:"column:sender_user_id"`
+	CreatedAt     time.Time `gorm:"column:created_at"`
+}
+
+type RedisMessage struct {
+	ServerId  string
+	Timestamp time.Time
+	MessageId uint32
+	Payload   string
+}
+
+type WebSocketConn interface {
+	WriteMessage(messageType int, data []byte) error
+}
+
+type WebSocketWrapper struct {
+	Conn *websocket.Conn
+}
+
+func (w *WebSocketWrapper) WriteMessage(messageType int, data []byte) error {
+	return w.Conn.WriteMessage(messageType, data)
 }

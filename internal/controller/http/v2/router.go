@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
 	"net/http"
@@ -18,6 +17,7 @@ import (
 	"business/internal/usecase/user/repo"
 	"business/pkg/logger"
 	"business/pkg/mysql"
+	ct "business/pkg/time"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -32,17 +32,10 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Inte
 	NewUserRoutes(u, user.New(repo.New(conn)), l)
 	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
 	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
-	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn)), l)
+	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn, ct.CustomTime{})), l, rdb)
 
-	// ログイン後URL
-	e.POST("/home", func(c echo.Context) error {
-		ID := c.Get("user_id")
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
+	// jwt認証URL
+	e.GET("/auth", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	}, jwtMiddleware())
 
