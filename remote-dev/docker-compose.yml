@@ -32,6 +32,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      CHANNEL: ${CHANNEL}
 
   mysql:
     image: mysql:8.0
