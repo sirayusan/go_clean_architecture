@@ -21,6 +21,7 @@ func TestNewMessageRouter(t *testing.T) {
 	// テスト用のHTTPリクエストを作成
 	req := httptest.NewRequest(http.MethodGet, "/chats/1", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	// TODO ローカル環境でjwtのテストが無視されるので要確認。
 	//jwtToken, err := auth.GenerateToken(uint32(1))
 	//assert.NoError(t, err)
 	//req.Header.Set("Authorization", "Bearer "+jwtToken)
