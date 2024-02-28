@@ -2,8 +2,8 @@ package time
 
 import "time"
 
-// TimeProvider は現在時刻を提供するインターフェースです。
-type TimeProvider interface {
+// WrapperTime は現在時刻を提供するインターフェースです。
+type WrapperTime interface {
 	Now() time.Time
 }
 

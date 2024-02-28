@@ -11,6 +11,7 @@ import (
 	"business/internal/usecase/room"
 	"business/pkg/logger"
 	"encoding/json"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
@@ -58,10 +59,8 @@ func (r *MessageRoutes) handleConnections(c echo.Context) error {
 		}
 	}()
 
-	wsWrapper := &entity.WebSocketWrapper{Conn: ws}
-
 	// リクエストをルームに参加させる。
-	err = r.t.JoinRoom(chatRoomID, wsWrapper, roomManager)
+	err = r.t.JoinRoom(chatRoomID, ws, roomManager)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -118,6 +117,32 @@ func validate(c echo.Context) (uint32, error) {
 	if err != nil {
 		return 0, echo.NewHTTPError(http.StatusBadRequest, "不正なリクエストパラメータ")
 	}
+
+	tokenString := c.QueryParam("jwt")
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+	})
+
+	if err != nil {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "トークンの解析に失敗しました")
+	}
+	if !token.Valid {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "無効なJWTトークンです")
+	}
+
+	claims, ok := token.Claims.(*jwt.StandardClaims)
+	if !ok {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "JWT claimsの取得に失敗しました")
+	}
+
+	if claims.ExpiresAt < time.Now().Unix() {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "JWTトークンの有効期限が切れています")
+	}
+
+	c.Set("userID", claims.Id)
 
 	return uint32(chatID), nil
 }

@@ -5,18 +5,18 @@ import (
 
 	"business/internal/entity"
 	"business/pkg/mysql"
-	ct "business/pkg/time"
+	wt "business/pkg/time"
 	"gorm.io/gorm"
 )
 
 type ChatRepository struct {
 	DB *gorm.DB
-	tp ct.TimeProvider
+	wt wt.WrapperTime
 }
 
 // New は新しいRepositoryインスタンスを生成します。
-func New(db *mysql.MySQL, tp ct.TimeProvider) *ChatRepository {
-	return &ChatRepository{DB: db.DB, tp: tp} // MySQL構造体のDBフィールドを使ってRepositoryを初期化
+func New(db *mysql.MySQL, tp wt.WrapperTime) *ChatRepository {
+	return &ChatRepository{DB: db.DB, wt: tp} // MySQL構造体のDBフィールドを使ってRepositoryを初期化
 }
 
 // GetMessageList はチャットに紐づくメッセージ一覧を取得します。
@@ -50,7 +50,7 @@ func (r *ChatRepository) CreateMessage(chatRoomID uint32, msg string, SenderUser
 		ChatRoomID:    chatRoomID,
 		Message:       msg,
 		SenderUserID:  SenderUserID,
-		CreatedAt:     r.tp.Now(),
+		CreatedAt:     r.wt.Now(),
 	}
 	err := r.DB.Create(&chatMessage).Error
 

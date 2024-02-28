@@ -10,7 +10,7 @@ import (
 type (
 	// Message -.
 	Message interface {
-		JoinRoom(uint32, entity.WebSocketConn, map[uint32]*entity.ChatRoom) error
+		JoinRoom(uint32, entity.WebSocketWrapper, map[uint32]*entity.ChatRoom) error
 		PubSub(echo.Context, *websocket.Conn, map[uint32]*entity.ChatRoom, uint32, *redis.Client)
 	}
 
