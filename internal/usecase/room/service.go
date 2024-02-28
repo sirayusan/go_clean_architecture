@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"io"
 	"os"
 	"strconv"
 	"time"
 
 	"business/internal/entity"
-	"github.com/gorilla/websocket"
+	ct "business/pkg/time"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -19,12 +18,14 @@ import (
 // MessageUseCase -.
 type MessageUseCase struct {
 	repo MessageRepo
+	wt   ct.WrapperTime
 }
 
 // New -.
-func New(r MessageRepo) *MessageUseCase {
+func New(r MessageRepo, wt ct.WrapperTime) *MessageUseCase {
 	return &MessageUseCase{
 		repo: r,
+		wt:   wt,
 	}
 }
 
@@ -68,16 +69,16 @@ func (uc *MessageUseCase) JoinRoom(
 
 func (uc *MessageUseCase) PubSub(
 	c echo.Context,
-	ws *websocket.Conn,
+	wsw entity.WebSocketWrapper,
 	roomManager map[uint32]*entity.ChatRoom,
 	chatRoomID uint32,
-	rdb *redis.Client,
+	rdb entity.RedisWrapper,
 ) {
 	// chatRoomID を文字列に変換
 	channelName := "room-" + fmt.Sprint(chatRoomID)
 
 	for {
-		_, msg, err := ws.ReadMessage()
+		_, msg, err := wsw.ReadMessage()
 		if err != nil {
 			if err == io.EOF {
 				// クライアントが接続を閉じた
@@ -97,13 +98,14 @@ func (uc *MessageUseCase) PubSub(
 			}
 		}
 	}
+
 }
 
 // processMessageはメッセージを処理するヘルパー関数です。
 func (uc *MessageUseCase) processMessage(
 	c echo.Context,
 	roomManager map[uint32]*entity.ChatRoom,
-	rdb *redis.Client,
+	rdb entity.RedisWrapper,
 	channelName string,
 	chatRoomID uint32,
 	_msg string,
@@ -133,7 +135,7 @@ func (uc *MessageUseCase) processMessage(
 	_json, err := json.Marshal(entity.Message{
 		UserName:  "",
 		Messages:  _msg,
-		CreatedAt: time.Now(),
+		CreatedAt: uc.wt.Now(),
 	})
 	if err != nil {
 		return err

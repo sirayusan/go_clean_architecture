@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"business/internal/entity"
 	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
 	"net/http"
@@ -32,7 +33,10 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Inte
 	NewUserRoutes(u, user.New(repo.New(conn)), l)
 	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
 	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
-	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn, ct.CustomTime{})), l, rdb)
+
+	_ct := ct.CustomTime{}
+	wrappedRdb := &entity.RedisConn{Conn: rdb}
+	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn, _ct), _ct), l, wrappedRdb)
 
 	// jwt認証URL
 	e.GET("/auth", func(c echo.Context) error {

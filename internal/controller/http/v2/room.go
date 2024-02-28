@@ -14,17 +14,16 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/redis/go-redis/v9"
 )
 
 type MessageRoutes struct {
 	t   usecase.Message
 	l   logger.Interface
-	rdb *redis.Client
+	rdb entity.RedisWrapper
 }
 
 // NewMessageRouter はチャット関連のURLからコントローラーを実行します。
-func NewMessageRouter(e *echo.Echo, t usecase.Message, l logger.Interface, r *redis.Client) {
+func NewMessageRouter(e *echo.Echo, t usecase.Message, l logger.Interface, r entity.RedisWrapper) {
 	routes := &MessageRoutes{t, l, r}
 	e.GET("/chats/:id", routes.handleConnections)
 }
@@ -72,9 +71,10 @@ func (r *MessageRoutes) handleConnections(c echo.Context) error {
 			c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 	}()
+	rdb := r.rdb
 
 	// ルーム参加者からのメッセージを検知し送信する。
-	r.t.PubSub(c, ws, roomManager, chatRoomID, r.rdb)
+	r.t.PubSub(c, ws, roomManager, chatRoomID, rdb)
 	currentServerID := os.ExpandEnv("${CHANNEL}") // 現在のサーバーIDを取得
 
 	for {

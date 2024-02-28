@@ -7,12 +7,19 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// RedisWrapper はRedis.Clientをラップします。
 type RedisWrapper interface {
-	Publish(c context.Context, channel string, message interface{}) *IntCmd
+	Publish(ctx context.Context, channel string, message interface{}) *IntCmd
+	Subscribe(ctx context.Context, channels ...string) *PubSub
 }
 
 type RedisConn struct {
 	Conn *redis.Client
+}
+
+func (r *RedisConn) Subscribe(ctx context.Context, channels ...string) *PubSub {
+	ps := r.Conn.Subscribe(ctx, channels...)
+	return &PubSub{ps: ps}
 }
 
 func (r *RedisConn) Publish(ctx context.Context, channel string, message interface{}) *IntCmd {
@@ -30,6 +37,18 @@ func (r *RedisConn) Publish(ctx context.Context, channel string, message interfa
 		},
 		val: val,
 	}
+}
+
+type PubSub struct {
+	ps *redis.PubSub
+}
+
+func (p *PubSub) ReceiveMessage(ctx context.Context) (*redis.Message, error) {
+	return p.ps.ReceiveMessage(ctx)
+}
+
+func (p *PubSub) Close() error {
+	return p.ps.Close()
 }
 
 type IntCmd struct {

@@ -2,16 +2,14 @@ package usecase
 
 import (
 	"business/internal/entity"
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/redis/go-redis/v9"
 )
 
 type (
 	// Message -.
 	Message interface {
 		JoinRoom(uint32, entity.WebSocketWrapper, map[uint32]*entity.ChatRoom) error
-		PubSub(echo.Context, *websocket.Conn, map[uint32]*entity.ChatRoom, uint32, *redis.Client)
+		PubSub(echo.Context, entity.WebSocketWrapper, map[uint32]*entity.ChatRoom, uint32, entity.RedisWrapper)
 	}
 
 	WebSocketConnInterface interface {
