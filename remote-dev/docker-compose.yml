@@ -9,30 +9,21 @@ services:
     tty: true
     ports:
       - ${GO_PORT}:${GO_PORT}
+      - ${GO_TLS_PORT}:${GO_TLS_PORT}
       - ${GO_DEBUG_PORT}:${GO_DEBUG_PORT}
-      - "5994:5994"
+      - ${REMOTE_CONTAINER_PORT}:${REMOTE_CONTAINER_PORT}
     volumes:
       - ../:/data
       - /data/ide
       - ~/.gitconfig:/home/go/.gitconfig
+      - ../cert/${SECRET_KEY_FILE_NAME}:${SECRET_KEY_PATH}/${SECRET_KEY_FILE_NAME}
+      - ../cert/${CERT_FILE_NAME}:${CERT_PATH}/${CERT_FILE_NAME}
     security_opt:
       - apparmor:unconfined
     cap_add:
       - SYS_PTRACE
     depends_on:
       - mysql
-    environment:
-      FRONT_DOMAIN: ${FRONT_DOMAIN}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      GO_PORT: ${GO_PORT}
-      DB_PORT: ${DB_PORT}
-      DB_HOST: ${DB_HOST}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_TEST_DATABASE: ${MYSQL_TEST_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      CHANNEL: ${CHANNEL}
 
   mysql:
     image: mysql:8.0

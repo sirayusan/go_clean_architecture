@@ -8,6 +8,8 @@ services:
       - ${GO_DEBUG_PORT}:${GO_DEBUG_PORT}
     volumes:
       - ${PROJECT_ROOT}:/data
+      - ../cert/${SECRET_KEY_FILE_NAME}:${SECRET_KEY_PATH}/${SECRET_KEY_FILE_NAME}
+      - ../cert/${CERT_FILE_NAME}:${CERT_PATH}/${CERT_FILE_NAME}
     security_opt: # delve用に必要
       - apparmor:unconfined
     cap_add: # delve用に必要
