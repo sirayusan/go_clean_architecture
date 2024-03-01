@@ -43,7 +43,14 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Inte
 		return c.NoContent(http.StatusOK)
 	}, jwtMiddleware())
 
-	e.Logger.Fatal(e.Start(os.ExpandEnv(":${GO_PORT}")))
+	if os.Getenv("USE_SSL") == "FALSE" {
+		e.Logger.Fatal(e.Start(":" + os.Getenv("GO_PORT")))
+	} else {
+		certKey := os.Getenv("CERT_PATH") + "/" + os.Getenv("CERT_FILE_NAME")
+		secretKey := os.Getenv("SECRET_KEY_PATH") + "/" + os.Getenv("SECRET_KEY_FILE_NAME")
+
+		e.Logger.Fatal(e.StartTLS(":"+os.Getenv("GO_TLS_PORT"), certKey, secretKey))
+	}
 }
 
 // jwtMiddleware は、JWTトークンを検証する認証ミドルウェアです。
