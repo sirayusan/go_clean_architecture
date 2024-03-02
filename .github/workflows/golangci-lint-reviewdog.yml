@@ -1,20 +1,27 @@
+# ワークフローの名前
 name: Golangci-lint ReviewDog
 
 on:
   pull_request:
 
+# ジョブ定義
 jobs:
+  # lint
   golangci-lint:
-    name: golangci-lint
+    # GITHUB_TOKEN への権限設定
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-      - name: golangci-lint
-        uses: reviewdog/action-golangci-lint@v1
+      - uses: actions/checkout@v3
+      - uses: reviewdog/action-golangci-lint@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.github_token }}
+          go_version: ^1.20
+          # reviewdog の動作モードの指定
+          reporter: github-pr-review
+          # Github Status へのレポートレベルの指定
           level: warning
           golangci_lint_flags: "--config=.golangci.yml"
-          filter_mode: nofilter
-          reporter: github-pr-review

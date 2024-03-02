@@ -15,7 +15,6 @@ func main() {
 		log.Fatalf("Config error: %s", err)
 	}
 	tets := "tets"
-	abc := "aaa"
 	fmt.Printf("%v \n", tets)
 
 	app.Run(cfg)

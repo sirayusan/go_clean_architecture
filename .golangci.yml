@@ -1,8 +1,5 @@
-# linter の設定
 linters:
-  # 全ての linter を無効化
   disable-all: true
-  # 指定した linter のみ有効化
   enable:
     - govet
     - errcheck
@@ -12,4 +9,5 @@ linters:
     - varcheck
     - misspell
     - lll
-    - gofumpt 
+    - gofumpt
+    - paralleltest
