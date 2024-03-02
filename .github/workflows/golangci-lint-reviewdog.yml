@@ -8,11 +8,6 @@ on:
 jobs:
   # lint
   golangci-lint:
-    # GITHUB_TOKEN への権限設定
-    permissions:
-      checks: write
-      contents: read
-      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
