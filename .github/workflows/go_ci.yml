@@ -22,7 +22,7 @@ jobs:
           --health-timeout=5s
           --health-retries=3
         volumes:
-          - ../../.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
+          - ./.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
 
     env:
       APP_NAME: go_clean_architecture
