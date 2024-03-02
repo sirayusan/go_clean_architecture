@@ -18,10 +18,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: reviewdog/action-golangci-lint@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN  }}
-          go_version: ^1.20
-          # reviewdog の動作モードの指定
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
-          # Github Status へのレポートレベルの指定
+          filter_mode: nofilter # すべてのコードを対象にする
           level: warning
           golangci_lint_flags: "--config=.golangci.yml"
