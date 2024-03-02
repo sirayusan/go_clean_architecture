@@ -30,14 +30,14 @@ jobs:
 
       - name: Wait for MySQL
         run: |
-          until mysqladmin ping -h"${{ env.DB_HOST }}" -P"${{ env.DB_PORT }}" --silent; do
+          until mysqladmin ping -h"${{ secrets.DB_HOST }}" -P"${{ secrets.DB_PORT }}" --silent; do
             echo 'waiting for mysql'
             sleep 1
           done
 
       - name: Execute SQL script
         run: |
-          mysql -h 127.0.0.1 --port 3306 -u root -p${{ env.MYSQL_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
+          mysql -h 127.0.0.1 --port 3306 -u root -p${{ secrets.MYSQL_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
 
       - name: Run Test
         run: go test -p=1 ./...
