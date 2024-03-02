@@ -64,6 +64,5 @@ jobs:
         run: |
           mysql -h 127.0.0.1 --port 3306 -u root -p${{ env.MYSQL_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
 
-
       - name: Run Test
         run: go test -p=1 ./...
