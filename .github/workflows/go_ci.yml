@@ -14,7 +14,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: test
-          MYSQL_USER: user
         ports:
           - 3306:3306
         options: >-
@@ -22,6 +21,8 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+        volumes:
+          - ../../.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d
 
     env:
       APP_NAME: go_clean_architecture
@@ -37,7 +38,7 @@ jobs:
       REMOTE_CONTAINER_PORT: 5994
       GO_DEBUG_PORT: 2345
       JWT_SECRET_KEY: sample
-      MYSQL_USER: user
+      MYSQL_USER: root
       MYSQL_PASSWORD: password
       DB_HOST: 127.0.0.1 # GitHub Actionsのサービスコンテナには127.0.0.1からアクセスします
       DB_PORT: 3306
