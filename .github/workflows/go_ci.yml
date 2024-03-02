@@ -11,8 +11,8 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: test
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_TEST_DATABASE }}
         ports:
           - 3306:3306
         options: >-
@@ -20,31 +20,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-
-    env:
-      APP_NAME: go_clean_architecture
-      FRONT_DOMAIN: http://localhost:3000
-      FRONT_SSL_DOMAIN: https://localhost:3000
-      USE_SSL: FALSE
-      SECRET_KEY_PATH: /etc/key
-      SECRET_KEY_FILE_NAME: server.key
-      CERT_PATH: /etc/crt
-      CERT_FILE_NAME: server.crt
-      GO_PORT: 8080
-      GO_TLS_PORT: 443
-      REMOTE_CONTAINER_PORT: 5994
-      GO_DEBUG_PORT: 2345
-      JWT_SECRET_KEY: sample
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      DB_HOST: 127.0.0.1 # GitHub Actionsのサービスコンテナには127.0.0.1からアクセスします
-      DB_PORT: 3306
-      MYSQL_DATABASE: development
-      MYSQL_TEST_DATABASE: test
-      REDIS_PORT: 6379
-      REDIS_HOST: redis
-      REDIS_DEBUG_GUI_PORT: 8001
-      CHANNEL: 1
 
     steps:
       - uses: actions/checkout@v3
@@ -55,14 +30,14 @@ jobs:
 
       - name: Wait for MySQL
         run: |
-          until mysqladmin ping -h"${{ env.DB_HOST }}" -P"${{ env.DB_PORT }}" --silent; do
+          until mysqladmin ping -h"${{ secrets.DB_HOST }}" -P"${{ secrets.DB_PORT }}" --silent; do
             echo 'waiting for mysql'
             sleep 1
           done
 
       - name: Execute SQL script
         run: |
-          mysql -h 127.0.0.1 --port 3306 -u root -p${{ env.MYSQL_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
+          mysql -h ${{ secrets.DB_HOST }} --port ${{ secrets.DB_PORT }} -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
 
       - name: Run Test
         run: go test -p=1 ./...
