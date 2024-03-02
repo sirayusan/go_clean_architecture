@@ -21,8 +21,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-        volumes:
-          - ./.devcontainer/infra/mysql/:/docker-entrypoint-initdb.d/
 
     env:
       APP_NAME: go_clean_architecture
@@ -62,6 +60,11 @@ jobs:
             echo 'waiting for mysql'
             sleep 1
           done
+
+      - name: Execute SQL script
+        run: |
+          mysql -h 127.0.0.1 --port 3306 -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
+
 
       - name: Run Test
         run: go test -p=1 ./...
