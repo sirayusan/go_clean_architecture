@@ -22,29 +22,29 @@ jobs:
           --health-retries=3
 
     env:
-      APP_NAME: go_clean_architecture
-      FRONT_DOMAIN: http://localhost:3000
-      FRONT_SSL_DOMAIN: https://localhost:3000
-      USE_SSL: FALSE
-      SECRET_KEY_PATH: /etc/key
-      SECRET_KEY_FILE_NAME: server.key
-      CERT_PATH: /etc/crt
-      CERT_FILE_NAME: server.crt
-      GO_PORT: 8080
-      GO_TLS_PORT: 443
-      REMOTE_CONTAINER_PORT: 5994
-      GO_DEBUG_PORT: 2345
-      JWT_SECRET_KEY: sample
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      DB_HOST: 127.0.0.1 # GitHub Actionsのサービスコンテナには127.0.0.1からアクセスします
-      DB_PORT: 3306
-      MYSQL_DATABASE: development
-      MYSQL_TEST_DATABASE: test
-      REDIS_PORT: 6379
-      REDIS_HOST: redis
-      REDIS_DEBUG_GUI_PORT: 8001
-      CHANNEL: 1
+      APP_NAME: ${{ secrets.APP_NAME }}
+      FRONT_DOMAIN: ${{ secrets.FRONT_DOMAIN }}
+      FRONT_SSL_DOMAIN: ${{ secrets.FRONT_SSL_DOMAIN }}
+      USE_SSL: ${{ secrets.USE_SSL }}
+      SECRET_KEY_PATH: ${{ secrets.SECRET_KEY_PATH }}
+      SECRET_KEY_FILE_NAME: ${{ secrets.SECRET_KEY_FILE_NAME }}
+      CERT_PATH: ${{ secrets.CERT_PATH }}
+      CERT_FILE_NAME: ${{ secrets.CERT_FILE_NAME }}
+      GO_PORT: ${{ secrets.GO_PORT }}
+      GO_TLS_PORT: ${{ secrets.GO_TLS_PORT }}
+      REMOTE_CONTAINER_PORT: ${{ secrets.REMOTE_CONTAINER_PORT }}
+      GO_DEBUG_PORT: ${{ secrets.GO_DEBUG_PORT }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      MYSQL_TEST_DATABASE: ${{ secrets.MYSQL_TEST_DATABASE }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_DEBUG_GUI_PORT: ${{ secrets.REDIS_DEBUG_GUI_PORT }}
+      CHANNEL: ${{ secrets.CHANNEL }}
 
     steps:
       - uses: actions/checkout@v3
