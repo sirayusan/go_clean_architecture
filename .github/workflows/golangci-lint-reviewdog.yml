@@ -1,19 +1,17 @@
-name: Golangci-lint ReviewDog
-on:
-  pull_request:
-# ジョブ定義
+name: ReviewDog
+
+on: [pull_request]
+
 jobs:
-  # lint
-  golangci-lint:
+  misspell:
+    name: Check spelling
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: reviewdog/action-golangci-lint@v2
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: misspell with reviewdog
+        uses: reviewdog/action-misspell@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN  }}
-          go_version: ^1.20
-          # reviewdog の動作モードの指定
-          reporter: github-pr-review
-          # Github Status へのレポートレベルの指定
-          level: warning
-          golangci_lint_flags: "--config=.golangci.yml"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          locale: "US"
