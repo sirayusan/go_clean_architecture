@@ -1,18 +1,16 @@
-name: ReviewDog
+name: reviewdog
 
 on: [pull_request]
 
 jobs:
-  misspell:
-    name: Check spelling
+  golangci-lint:
+    name: runner / golangci-lint
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-
-      - name: misspell with reviewdog
-        uses: reviewdog/action-misspell@v1
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          locale: "US"
           reporter: github-pr-review
