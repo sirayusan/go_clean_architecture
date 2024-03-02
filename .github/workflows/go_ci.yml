@@ -14,6 +14,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: test
+          MYSQL_USER: user
         ports:
           - 3306:3306
         options: >-
