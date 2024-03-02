@@ -31,9 +31,16 @@ func Run(cfg *config.Config) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	var frontDomain string
+	if os.Getenv("USE_SSL") == "FALSE" {
+		frontDomain = os.Getenv("FRONT_DOMAIN")
+	} else {
+		frontDomain = os.Getenv("FRONT_SSL_DOMAIN")
+	}
+
 	// フロントのURLをCORS承認する
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{os.ExpandEnv("${FRONT_DOMAIN}")},
+		AllowOrigins: []string{frontDomain},
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 	}))
 

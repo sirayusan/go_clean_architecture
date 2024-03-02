@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"fmt"
+	"business/internal/entity"
 	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
 	"net/http"
@@ -18,6 +18,7 @@ import (
 	"business/internal/usecase/user/repo"
 	"business/pkg/logger"
 	"business/pkg/mysql"
+	ct "business/pkg/time"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -32,21 +33,24 @@ func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Inte
 	NewUserRoutes(u, user.New(repo.New(conn)), l)
 	NewAuthRouter(e, authusecase.New(authrepo.New(conn)), l)
 	NewChatRouter(e, chatusecase.New(chatrepo.New(conn)), l)
-	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn)), l)
 
-	// ログイン後URL
-	e.POST("/home", func(c echo.Context) error {
-		ID := c.Get("user_id")
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
-		fmt.Printf("%v \n", ID)
+	_ct := ct.CustomTime{}
+	wrappedRdb := &entity.RedisConn{Conn: rdb}
+	NewMessageRouter(e, massageusecase.New(massagerepo.New(conn, _ct), _ct), l, wrappedRdb)
+
+	// jwt認証URL
+	e.GET("/auth", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	}, jwtMiddleware())
 
-	e.Logger.Fatal(e.Start(os.ExpandEnv(":${GO_PORT}")))
+	if os.Getenv("USE_SSL") == "FALSE" {
+		e.Logger.Fatal(e.Start(":" + os.Getenv("GO_PORT")))
+	} else {
+		certKey := os.Getenv("CERT_PATH") + "/" + os.Getenv("CERT_FILE_NAME")
+		secretKey := os.Getenv("SECRET_KEY_PATH") + "/" + os.Getenv("SECRET_KEY_FILE_NAME")
+
+		e.Logger.Fatal(e.StartTLS(":"+os.Getenv("GO_TLS_PORT"), certKey, secretKey))
+	}
 }
 
 // jwtMiddleware は、JWTトークンを検証する認証ミドルウェアです。

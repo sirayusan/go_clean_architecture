@@ -1,0 +1,68 @@
+name: Go CI
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_TEST_DATABASE }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    env:
+      APP_NAME: ${{ secrets.APP_NAME }}
+      FRONT_DOMAIN: ${{ secrets.FRONT_DOMAIN }}
+      FRONT_SSL_DOMAIN: ${{ secrets.FRONT_SSL_DOMAIN }}
+      USE_SSL: ${{ secrets.USE_SSL }}
+      SECRET_KEY_PATH: ${{ secrets.SECRET_KEY_PATH }}
+      SECRET_KEY_FILE_NAME: ${{ secrets.SECRET_KEY_FILE_NAME }}
+      CERT_PATH: ${{ secrets.CERT_PATH }}
+      CERT_FILE_NAME: ${{ secrets.CERT_FILE_NAME }}
+      GO_PORT: ${{ secrets.GO_PORT }}
+      GO_TLS_PORT: ${{ secrets.GO_TLS_PORT }}
+      REMOTE_CONTAINER_PORT: ${{ secrets.REMOTE_CONTAINER_PORT }}
+      GO_DEBUG_PORT: ${{ secrets.GO_DEBUG_PORT }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      MYSQL_TEST_DATABASE: ${{ secrets.MYSQL_TEST_DATABASE }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_DEBUG_GUI_PORT: ${{ secrets.REDIS_DEBUG_GUI_PORT }}
+      CHANNEL: ${{ secrets.CHANNEL }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ^1.22
+
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -h"${{ secrets.DB_HOST }}" -P"${{ secrets.DB_PORT }}" --silent; do
+            echo 'waiting for mysql'
+            sleep 1
+          done
+
+      - name: Execute SQL script
+        run: |
+          mysql -h ${{ secrets.DB_HOST }} --port ${{ secrets.DB_PORT }} -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} -e "$(cat ./.devcontainer/infra/mysql/1_ddl.sql)"
+
+      - name: Run Test
+        run: go test -p=1 ./...
