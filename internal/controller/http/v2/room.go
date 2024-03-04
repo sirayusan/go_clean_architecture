@@ -10,7 +10,6 @@ import (
 	"business/internal/entity"
 	"business/internal/usecase/room"
 	"business/pkg/logger"
-	"encoding/json"
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -63,49 +62,16 @@ func (r *MessageRoutes) handleConnections(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
+	r.t.PubSub(c, ws, roomManager, chatRoomID, r.rdb)
 
 	subscribe := r.rdb.Subscribe(c.Request().Context(), "room-"+fmt.Sprint(chatRoomID))
-
 	defer func() {
 		if err := subscribe.Close(); err != nil {
 			c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 	}()
-	rdb := r.rdb
-
-	// ルーム参加者からのメッセージを検知し送信する。
-	r.t.PubSub(c, ws, roomManager, chatRoomID, rdb)
-	currentServerID := os.ExpandEnv("${CHANNEL}") // 現在のサーバーIDを取得
-
-	for {
-		msg, err := subscribe.ReceiveMessage(c.Request().Context())
-		if err != nil {
-			// エラーハンドリング
-			break
-		}
-
-		var receivedMessage entity.RedisMessage
-		err = json.Unmarshal([]byte(msg.Payload), &receivedMessage)
-		if err != nil {
-			// JSONのアンマーシャル中にエラーが発生した場合のエラーハンドリング
-			break
-		}
-
-		// 現在のサーバーIDと受信したメッセージのサーバーIDが異なる場合に処理を実行
-		if receivedMessage.ServerId != currentServerID {
-			_json, err := json.Marshal(entity.Message{
-				SenderUserID: 1,
-				UserName:     "",
-				Messages:     receivedMessage.Payload,
-				CreatedAt:    time.Now(),
-			})
-			if err != nil {
-				break
-			}
-
-			roomManager[chatRoomID].Publish(_json)
-		}
-	}
+	// オートスケールを考慮し違うサーバーのメッセージを検知し、送信する。
+	r.t.RedisPubSub(c, subscribe, roomManager, chatRoomID)
 
 	return nil
 }

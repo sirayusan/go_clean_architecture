@@ -144,3 +144,42 @@ func (uc *MessageUseCase) processMessage(
 	roomManager[chatRoomID].Publish(_json)
 	return nil
 }
+
+func (uc *MessageUseCase) RedisPubSub(
+	c echo.Context,
+	subscribe *entity.PubSub,
+	roomManager map[uint32]*entity.ChatRoom,
+	chatRoomID uint32,
+) {
+	currentServerID := os.ExpandEnv("${CHANNEL}") // 現在のサーバーIDを取得
+
+	for {
+		msg, err := subscribe.ReceiveMessage(c.Request().Context())
+		if err != nil {
+			// エラーハンドリング
+			break
+		}
+
+		var receivedMessage entity.RedisMessage
+		err = json.Unmarshal([]byte(msg.Payload), &receivedMessage)
+		if err != nil {
+			// JSONのアンマーシャル中にエラーが発生した場合のエラーハンドリング
+			break
+		}
+
+		// 現在のサーバーIDと受信したメッセージのサーバーIDが異なる場合に処理を実行
+		if receivedMessage.ServerId != currentServerID {
+			_json, err := json.Marshal(entity.Message{
+				SenderUserID: 1,
+				UserName:     "",
+				Messages:     receivedMessage.Payload,
+				CreatedAt:    time.Now(),
+			})
+			if err != nil {
+				break
+			}
+
+			roomManager[chatRoomID].Publish(_json)
+		}
+	}
+}
