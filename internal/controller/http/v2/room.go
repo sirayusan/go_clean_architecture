@@ -56,22 +56,19 @@ func (r *MessageRoutes) handleConnections(c echo.Context) error {
 			c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 	}()
-
-	// リクエストをルームに参加させる。
-	err = r.t.JoinRoom(chatRoomID, ws, roomManager)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	r.t.PubSub(c, ws, roomManager, chatRoomID, r.rdb)
-
 	subscribe := r.rdb.Subscribe(c.Request().Context(), "room-"+fmt.Sprint(chatRoomID))
 	defer func() {
 		if err := subscribe.Close(); err != nil {
 			c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 	}()
-	// オートスケールを考慮し違うサーバーのメッセージを検知し、送信する。
-	r.t.RedisPubSub(c, subscribe, roomManager, chatRoomID)
+
+	// リクエストをルームに参加させる。
+	err = r.t.JoinRoom(chatRoomID, ws, roomManager)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	r.t.PubSub(c, ws, r.rdb, subscribe, roomManager, chatRoomID)
 
 	return nil
 }

@@ -9,8 +9,7 @@ type (
 	// Message -.
 	Message interface {
 		JoinRoom(uint32, entity.WebSocketWrapper, map[uint32]*entity.ChatRoom) error
-		PubSub(echo.Context, entity.WebSocketWrapper, map[uint32]*entity.ChatRoom, uint32, entity.RedisWrapper)
-		RedisPubSub(echo.Context, *entity.PubSub, map[uint32]*entity.ChatRoom, uint32)
+		PubSub(echo.Context, entity.WebSocketWrapper, entity.RedisWrapper, *entity.PubSub, map[uint32]*entity.ChatRoom, uint32)
 	}
 
 	WebSocketConnInterface interface {

@@ -26,11 +26,7 @@ func (m *MessageMock) JoinRoom(chatRoomID uint32, wsw entity.WebSocketWrapper, r
 	return args.Error(0)
 }
 
-func (m *MessageMock) PubSub(c echo.Context, wsw entity.WebSocketWrapper, roomManager map[uint32]*entity.ChatRoom, chatRoomID uint32, rdb entity.RedisWrapper) {
-	return
-}
-
-func (m *MessageMock) RedisPubSub(c echo.Context, subscribe *entity.PubSub, roomManager map[uint32]*entity.ChatRoom, chatRoomID uint32) {
+func (m *MessageMock) PubSub(c echo.Context, wsw entity.WebSocketWrapper, rdb entity.RedisWrapper, subscribe *entity.PubSub, roomManager map[uint32]*entity.ChatRoom, chatRoomID uint32) {
 	return
 }
 
