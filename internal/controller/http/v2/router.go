@@ -1,13 +1,18 @@
 package v2
 
 import (
-	"business/internal/entity"
-	"github.com/golang-jwt/jwt"
-	"github.com/redis/go-redis/v9"
+	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/redis/go-redis/v9"
+
+	"business/internal/entity"
 	authusecase "business/internal/usecase/auth"
 	authrepo "business/internal/usecase/auth/repo"
 	chatusecase "business/internal/usecase/chat"
@@ -19,8 +24,6 @@ import (
 	"business/pkg/logger"
 	"business/pkg/mysql"
 	ct "business/pkg/time"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func NewRouter(e *echo.Echo, conn *mysql.MySQL, rdb *redis.Client, l logger.Interface) {
@@ -92,6 +95,40 @@ func jwtMiddleware() echo.MiddlewareFunc {
 			c.Set("userID", claims.Id)
 
 			// トークンが有効な場合は次のハンドラーに処理を渡す
+			return next(c)
+		}
+	}
+}
+
+// websocketJwtMiddleware は、WebSocket用のJWTトークンを検証する認証ミドルウェアです。
+func websocketJwtMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			chatIDStr := c.Param("id")
+			_, err := strconv.Atoi(chatIDStr)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusBadRequest, "不正なリクエストパラメータ")
+			}
+
+			tokenString := c.QueryParam("jwt")
+			token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
+				return []byte(os.ExpandEnv("${JWT_SECRET_KEY}")), nil
+			})
+
+			if err != nil {
+				return echo.NewHTTPError(http.StatusUnauthorized, "トークンの解析に失敗しました")
+			}
+
+			claims, ok := token.Claims.(*jwt.StandardClaims)
+			if !ok {
+				return echo.NewHTTPError(http.StatusUnauthorized, "JWT claimsの取得に失敗しました")
+			}
+
+			c.Set("userID", claims.Id)
+
 			return next(c)
 		}
 	}

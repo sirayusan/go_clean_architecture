@@ -59,7 +59,7 @@ func TestWebSocketHandler(t *testing.T) {
 	assert.Empty(t, err)
 
 	e := echo.New()
-	e.GET("/chats/:id", routes.handleConnections)
+	e.GET("/chats/:id", routes.handleConnections, websocketJwtMiddleware())
 
 	// テスト用サーバーの立ち上げ
 	server := httptest.NewServer(e)
@@ -93,7 +93,7 @@ func TestWebSocketHandlerException(t *testing.T) {
 	assert.Empty(t, err)
 
 	e := echo.New()
-	e.GET("/chats/:id", routes.handleConnections)
+	e.GET("/chats/:id", routes.handleConnections, websocketJwtMiddleware())
 
 	// テスト用サーバーの立ち上げ
 	server := httptest.NewServer(e)
@@ -125,7 +125,7 @@ func TestWebSocketHandlerException2(t *testing.T) {
 	jwtToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTIxNTI4NjUsImp0aSI6IjEiLCJpYXQiOjE3MDk1NjA4NjUsImlzcyI6Ijpnb19jbGVhbl9hcmNoaXRlY3R1cmUifQ.vVA44m7iFqubbUU2RBVJFE3jACyDB72PY6d8als6Y-nQ"
 
 	e := echo.New()
-	e.GET("/chats/:id", routes.handleConnections)
+	e.GET("/chats/:id", routes.handleConnections, websocketJwtMiddleware())
 
 	// テスト用サーバーの立ち上げ
 	server := httptest.NewServer(e)
@@ -136,32 +136,56 @@ func TestWebSocketHandlerException2(t *testing.T) {
 }
 
 // TestWebSocketHandlerException3 異常系:JWTトークンの有効期限が切れています
-//func TestWebSocketHandlerException3(t *testing.T) {
-//	rdb := redis.NewRedis()
-//	wrappedRdb := &entity.RedisConn{Conn: rdb}
-//	messageUseCaseMock := new(MessageMock)
-//	loggerMock := new(MockLogger)
-//	routes := MessageRoutes{
-//		t:   messageUseCaseMock,
-//		l:   loggerMock,
-//		rdb: wrappedRdb,
-//	}
-//	messageUseCaseMock.On(
-//		"JoinRoom",
-//		mock.AnythingOfType("uint32"),
-//		mock.AnythingOfType("*websocket.Conn"),
-//		mock.AnythingOfType("map[uint32]*entity.ChatRoom"),
-//	).Return(nil)
-//
-//	jwtToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTIxNTQwMzIsImp0aSI6IjEiLCJpYXQiOjE3MDk1NjIwMzIsImlzcyI6Ijpnb19jbGVhbl9hcmNoaXRlY3R1cmUifQ.lrR_1ufVsWlnVqqMhgF1w_RImMdiHVuVJ_MO7FcSxAc"
-//
-//	e := echo.New()
-//	e.GET("/chats/:id", routes.handleConnections)
-//
-//	// テスト用サーバーの立ち上げ
-//	server := httptest.NewServer(e)
-//	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/chats/1?jwt=" + jwtToken
-//	_, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-//	assert.NotEmpty(t, err)
-//	assert.Equal(t, "websocket: bad handshake", err.Error())
-//}
+func TestWebSocketHandlerException3(t *testing.T) {
+	rdb := redis.NewRedis()
+	wrappedRdb := &entity.RedisConn{Conn: rdb}
+	messageUseCaseMock := new(MessageMock)
+	loggerMock := new(MockLogger)
+	routes := MessageRoutes{
+		t:   messageUseCaseMock,
+		l:   loggerMock,
+		rdb: wrappedRdb,
+	}
+	messageUseCaseMock.On(
+		"JoinRoom",
+		mock.AnythingOfType("uint32"),
+		mock.AnythingOfType("*websocket.Conn"),
+		mock.AnythingOfType("map[uint32]*entity.ChatRoom"),
+	).Return(nil)
+
+	jwtToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDk2NTEwNDksImp0aSI6IjEiLCJpYXQiOjE3MDk2NTEwNDksImlzcyI6ImdvX2NsZWFuX2FyY2hpdGVjdHVyZSJ9.Fjz4HgFvpnkVOTxu-h1HFubByxYznMCpIoj6rkS6XY8"
+
+	e := echo.New()
+	e.GET("/chats/:id", routes.handleConnections, websocketJwtMiddleware())
+
+	// テスト用サーバーの立ち上げ
+	server := httptest.NewServer(e)
+	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/chats/1?jwt=" + jwtToken
+	_, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	assert.NotEmpty(t, err)
+	assert.Equal(t, "websocket: bad handshake", err.Error())
+}
+
+// TestNewMessageRouter呼び出し
+// WebSocketを再現していないのでエラーになるが、Routerの動作確認ができているので問題ない。
+func TestNewMessageRouter(t *testing.T) {
+	e := echo.New()
+	rdb := entity.RedisConn{}
+	wrappedRdb := &entity.RedisConn{Conn: rdb.Conn}
+	messageUseCaseMock := new(MessageMock)
+	loggerMock := new(MockLogger)
+
+	NewMessageRouter(e, messageUseCaseMock, loggerMock, wrappedRdb)
+	messageUseCaseMock.AssertExpectations(t)
+	loggerMock.AssertExpectations(t)
+
+	jwtToken, err := auth.GenerateToken(uint32(1))
+	assert.Empty(t, err)
+
+	req := httptest.NewRequest(http.MethodGet, "/chats/1?jwt="+jwtToken, nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	res := httptest.NewRecorder()
+	e.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusBadRequest, res.Code, "Expected HTTP status code 200")
+}
