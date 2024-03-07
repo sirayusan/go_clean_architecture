@@ -59,3 +59,10 @@ tasks:
     desc: "test schema のテーブルにデータを投入する。"
     cmds:
       - go run cmd/seeder/main.go dev
+
+  test:
+    desc: "カバレッジ率を取得する。"
+    cmds:
+      - go test -p=1 -cover -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - rm coverage.out

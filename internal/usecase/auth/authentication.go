@@ -1,15 +1,11 @@
 package usecase
 
 import (
+	"business/internal/entity"
+	"business/pkg/auth"
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
-	"os"
-	"strconv"
-	"time"
-
-	"business/internal/entity"
 )
 
 // AuthUseCase -.
@@ -46,7 +42,7 @@ func (uc *AuthUseCase) GenerateJwtToken(param entity.LoginRequest) (string, erro
 	// isValidPassword　DBから取得した暗号化パスワードとリクエストのパスワードを暗号化して比較した結果、一致したらtrueが入る。
 	isValidPassword := user.IsValidPassword(param.Password)
 	if isValidPassword {
-		token, err := generateToken(user.UserID)
+		token, err := auth.GenerateToken(user.UserID)
 		if err != nil {
 			return "", err
 		}
@@ -54,28 +50,4 @@ func (uc *AuthUseCase) GenerateJwtToken(param entity.LoginRequest) (string, erro
 	} else {
 		return "", errors.New("invalid password")
 	}
-}
-
-func generateToken(userID uint32) (string, error) {
-	// トークンの有効期限を設定
-	expirationTime := time.Now().Add(24 * 30 * time.Hour)
-
-	// JWTのクレームを設定
-	claims := &jwt.StandardClaims{
-		Issuer:    os.ExpandEnv(":${APP_NAME}"),
-		IssuedAt:  time.Now().Unix(),
-		Id:        strconv.FormatUint(uint64(userID), 10), // ユーザーID
-		ExpiresAt: expirationTime.Unix(),                  // 有効期限
-	}
-
-	// トークンを生成
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// 秘密鍵で署名
-	tokenString, err := token.SignedString([]byte(os.ExpandEnv("${JWT_SECRET_KEY}")))
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
 }
