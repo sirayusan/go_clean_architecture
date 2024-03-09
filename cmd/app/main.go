@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"business/config"
@@ -13,6 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Config error: %s", err)
 	}
+	tets := "tets atew "
+	fmt.Printf("%v \n", tets)
 
 	app.Run(cfg)
 }
